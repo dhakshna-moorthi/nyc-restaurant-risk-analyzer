@@ -108,7 +108,7 @@ nyc-restaurant-risk-analyzer/
 │   ├── package.json
 │   └── vite.config.js
 ├── requirements.txt
-├── .env.example
+├── .env
 └── README.md
 ```
 
