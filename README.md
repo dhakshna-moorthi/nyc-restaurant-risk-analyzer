@@ -193,8 +193,8 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=nyc_restaurant_risk
 
-REDIS\_HOST=localhost
-REDIS\_PORT=6379
+REDIS_HOST=localhost
+REDIS_PORT=6379
 
 OPENAI_API_KEY=your_openai_key
 
