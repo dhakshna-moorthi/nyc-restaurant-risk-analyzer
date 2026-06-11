@@ -1,0 +1,62 @@
+/* ── Home page styles ─────────────────────────────────────────────────────── */
+
+/* Daily Briefing card */
+.briefing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.briefing-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.briefing-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.badge-cached {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.briefing-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #e67e22;
+  padding: 12px 0 12px 12px;
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+.briefing-row:first-child {
+  border-top: none;
+}
+
+.briefing-skeleton-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid #e67e22;
+  padding: 12px 0 12px 12px;
+}
+
+.briefing-skeleton-row:first-child {
+  border-top: none;
+}
+
+.briefing-skeleton-block {
+  height: 14px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+}
+
