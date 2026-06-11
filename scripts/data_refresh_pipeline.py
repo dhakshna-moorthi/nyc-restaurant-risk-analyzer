@@ -402,7 +402,7 @@ def main():
         if df is not None:
             # Step 1 - Create tables
             logger.info("Step 1/5: Creating tables...")
-            # create_tables()
+            create_tables()
             logger.info("✓ Tables ready")
             
             # Step 2 - Load restaurant and inspection data
