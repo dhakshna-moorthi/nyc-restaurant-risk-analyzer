@@ -23,8 +23,9 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
+DB_POOLER = os.getenv("DB_POOLER")
 
-DB_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DB_URL = f"postgresql://{DB_USER}.{DB_HOST}:{DB_PASSWORD}@{DB_POOLER}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DB_URL)
 
 # r = redis.Redis(
@@ -433,7 +434,7 @@ def main():
             
             #step 6 - Clear Redis cache
             if df is not None and not df.empty:
-                r.flushdb()
+                redis_client.flushdb()
                 logger.info("✓ Redis database cleared.")
 
         elapsed = datetime.now() - start_time
