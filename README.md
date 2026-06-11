@@ -81,63 +81,34 @@ The system computes a research-backed risk score for every restaurant, surfaces 
 nyc-restaurant-risk-analyzer/
 
 ├── app/
-
 │   ├── main.py
-
 │   ├── database.py
-
 │   ├── models.py
-
 │   ├── schemas.py
-
 │   ├── routes/
-
 │   │   └── routes.py
-
 │   └── services/
-
-│       ├── restaurant\_service.py
-
-│       ├── llm\_service.py
-
-│       ├── rag\_service.py
-
-│       ├── chatbot\_service.py
-
-│       └── redis\_service.py
-
+│       ├── restaurant_service.py
+│       ├── llm_service.py
+│       ├── rag_service.py
+│       ├── chatbot_service.py
+│       └── redis_service.py
 ├── scripts/
-
-│   └── data\_refresh\_pipeline.py
-
+│   └── data_refresh_pipeline.py
 ├── frontend/
-
 │   ├── public/
-
 │   ├── src/
-
 │   │   ├── assets/
-
 │   │   ├── components/
-
 │   │   ├── pages/
-
 │   │   ├── styles/
-
 │   │   ├── App.jsx
-
 │   │   └── main.jsx
-
 │   ├── index.html
-
 │   ├── package.json
-
 │   └── vite.config.js
-
 ├── requirements.txt
-
 ├── .env.example
-
 └── README.md
 ```
 
