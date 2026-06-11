@@ -365,7 +365,7 @@ export default function RestaurantList() {
           ...(sortBy ? { sort_by: sortBy, sort_order: sortOrder } : {}),
         })
         const response = await fetch(
-          `http://localhost:8000/restaurants?${params}`,
+          `${import.meta.env.VITE_API_URL}/restaurants?${params}`,
           {
             signal: controller.signal,
             headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
@@ -403,7 +403,7 @@ export default function RestaurantList() {
           ...(debouncedCuisine ? { cuisine: debouncedCuisine } : {}),
         })
         const response = await fetch(
-          `http://localhost:8000/restaurants/bubble?${params}`,
+          `${import.meta.env.VITE_API_URL}/restaurants/bubble?${params}`,
           {
             signal: controller.signal,
             headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },

@@ -430,7 +430,7 @@ function RestaurantDetail({ camis }) {
     const fetchDetail = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/restaurants/${camis}?page=1`,
+          `${import.meta.env.VITE_API_URL}/restaurants/${camis}?page=1`,
           {
             signal: controller.signal,
             headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
@@ -456,7 +456,7 @@ function RestaurantDetail({ camis }) {
     const fetchPage = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/restaurants/${camis}?page=${inspPage}`,
+          `${import.meta.env.VITE_API_URL}/restaurants/${camis}?page=${inspPage}`,
           {
             signal: controller.signal,
             headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
@@ -478,7 +478,7 @@ function RestaurantDetail({ camis }) {
   const fetchInsights = () => {
     setInsightsLoading(true)
     setInsightsError(false)
-    fetch(`http://localhost:8000/restaurants/${camis}/insights`, {
+    fetch(`${import.meta.env.VITE_API_URL}/restaurants/${camis}/insights`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
     })
       .then((res) => { if (!res.ok) throw new Error('Failed'); return res.json() })

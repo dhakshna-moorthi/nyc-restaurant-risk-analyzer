@@ -63,7 +63,7 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, { role: 'user', content: msg, timestamp: now }])
     setLoading(true)
     try {
-      const res = await fetch('http://localhost:8000/chat', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
