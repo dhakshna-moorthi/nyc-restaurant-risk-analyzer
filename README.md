@@ -12,10 +12,6 @@ SafePlate analyzes ~290,000 NYC DOHMH restaurant inspection records across 27,00
 
 The system computes a research-backed risk score for every restaurant, surfaces AI-generated insights grounded in historical violation patterns, and provides a natural language chatbot for ad-hoc queries.
 
-**Demo credentials:**
-- Username: `inspector`
-- Password: `safeplate2026`
-
 ---
 
 ## Features
