@@ -119,7 +119,7 @@ nyc-restaurant-risk-analyzer/
 │   ├── package.json
 │   └── vite.config.js
 ├── requirements.txt
-├── .env.example
+├── .env
 └── README.md
 ```
 
@@ -143,7 +143,7 @@ cd nyc-restaurant-risk-analyzer
 
 # Create virtual environment
 python -m venv venv
-venv\\Scripts\\activate  # Windows
+venv\Scripts\activate  # Windows
 source venv/bin/activate  # Mac/Linux
 
 # Install dependencies
@@ -169,7 +169,7 @@ npm run dev
 
 ```bash
 # Run the full data pipeline (first time setup)
-python scripts/data\_refresh\_pipeline.py
+python scripts/data_refresh_pipeline.py
 ```
 
 This will:
@@ -187,20 +187,20 @@ This will:
 Create a `.env` file based on `.env.example`:
 
 ```
-DB\_USER=postgres
-DB\_PASSWORD=your\_password
-DB\_HOST=localhost
-DB\_PORT=5432
-DB\_NAME=nyc\_restaurant\_risk
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=nyc_restaurant_risk
 
-REDIS\_HOST=localhost
-REDIS\_PORT=6379
+REDIS_HOST=localhost
+REDIS_PORT=6379
 
-OPENAI\_API\_KEY=your\_openai\_key
+OPENAI_API_KEY=your_openai_key
 
-LOGIN\_USERNAME=inspector
-LOGIN\_PASSWORD=your\_password
-JWT\_SECRET=your\_jwt\_secret
+LOGIN_USERNAME=inspector
+LOGIN_PASSWORD=your_password
+JWT_SECRET=your_jwt_secret
 ```
 
 \---
