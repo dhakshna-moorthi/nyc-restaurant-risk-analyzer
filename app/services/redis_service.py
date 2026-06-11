@@ -1,13 +1,19 @@
 import redis
 import os
 from dotenv import load_dotenv
+from upstash_redis import Redis
 
 load_dotenv()
 
-redis_client = redis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=int(os.getenv("REDIS_PORT", 6379)),
-    decode_responses=True
+# redis_client = redis.Redis(
+#     host=os.getenv("REDIS_HOST", "localhost"),
+#     port=int(os.getenv("REDIS_PORT", 6379)),
+#     decode_responses=True
+# )
+
+redis_client = Redis(
+    url=os.getenv("UPSTASH_REDIS_REST_URL"),
+    token=os.getenv("UPSTASH_REDIS_REST_TOKEN")
 )
 
 def get_cached(key: str):

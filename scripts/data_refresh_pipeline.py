@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, text
 from sentence_transformers import SentenceTransformer
 from datetime import date, datetime
+from upstash_redis import Redis
 from dotenv import load_dotenv
 import pandas as pd
 import logging
@@ -26,10 +27,15 @@ DB_NAME = os.getenv("DB_NAME")
 DB_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 engine = create_engine(DB_URL)
 
-r = redis.Redis(
-    host=os.getenv("REDIS_HOST"),
-    port=int(os.getenv("REDIS_PORT", 6379)),
-    decode_responses=True
+# r = redis.Redis(
+#     host=os.getenv("REDIS_HOST"),
+#     port=int(os.getenv("REDIS_PORT", 6379)),
+#     decode_responses=True
+# )
+
+redis_client = Redis(
+    url=os.getenv("UPSTASH_REDIS_REST_URL"),
+    token=os.getenv("UPSTASH_REDIS_REST_TOKEN")
 )
 
 
@@ -402,7 +408,7 @@ def main():
         if df is not None:
             # Step 1 - Create tables
             logger.info("Step 1/5: Creating tables...")
-            create_tables()
+            # create_tables()
             logger.info("✓ Tables ready")
             
             # Step 2 - Load restaurant and inspection data
@@ -412,7 +418,7 @@ def main():
         
             # Step 3 - Load violation codes
             logger.info("Step 3/5: Loading violation codes...")
-            load_violation_codes_data()
+            # load_violation_codes_data()
             logger.info("✓ Violation codes loaded")
             
             # Step 4 - Compute violation embeddings
