@@ -79,7 +79,6 @@ The system computes a research-backed risk score for every restaurant, surfaces 
 ```
 
 nyc-restaurant-risk-analyzer/
-
 ├── app/
 │   ├── main.py
 │   ├── database.py
@@ -100,15 +99,27 @@ nyc-restaurant-risk-analyzer/
 │   ├── src/
 │   │   ├── assets/
 │   │   ├── components/
+│   │   │   ├── Navbar.jsx
+│   │   │   └── Shared.jsx
 │   │   ├── pages/
+│   │   │   ├── Home.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── RestaurantDetail.jsx
+│   │   │   ├── Chatbot.jsx
+│   │   │   └── Login.jsx
 │   │   ├── styles/
+│   │   │   ├── home.css
+│   │   │   ├── dashboard.css
+│   │   │   ├── restaurant-detail.css
+│   │   │   ├── chatbot.css
+│   │   │   └── shared.css
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── index.html
 │   ├── package.json
 │   └── vite.config.js
 ├── requirements.txt
-├── .env
+├── .env.example
 └── README.md
 ```
 
