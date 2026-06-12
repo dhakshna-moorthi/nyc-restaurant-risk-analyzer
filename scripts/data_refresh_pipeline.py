@@ -1,13 +1,13 @@
 from sqlalchemy import create_engine, text
-from sentence_transformers import SentenceTransformer
 from datetime import date, datetime
 from upstash_redis import Redis
+from openai import OpenAI
 from dotenv import load_dotenv
 import pandas as pd
 import logging
 import requests
-import redis
 import os
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,14 +18,10 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 DB_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DB_URL)
-
-# r = redis.Redis(
-#     host=os.getenv("REDIS_HOST"),
-#     port=int(os.getenv("REDIS_PORT", 6379)),
-#     decode_responses=True
-# )
 
 redis_client = Redis(
     url=os.getenv("UPSTASH_REDIS_REST_URL"),
@@ -205,44 +201,99 @@ def load_violation_codes_data():
     print(violation_df['risk_tier'].value_counts())
 
 
-def compute_violation_embeddings():
-    # Load sentence transformer model
-    print("Loading embedding model...")
-    model = SentenceTransformer('all-MiniLM-L6-v2')
-
-    # Fetch all inspections with violation descriptions
-    print("Fetching violation data...")
-    query = """
+def compute_violation_embeddings(affected_camis: set = None):
+    logger.info("Starting embedding update...")
+    
+    from openai import OpenAI
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    
+    # If no specific CAMISes provided, embed all (first time setup)
+    if affected_camis:
+        logger.info(f"Updating embeddings for {len(affected_camis)} affected restaurants...")
+        camis_filter = f"AND camis IN ({','.join(str(c) for c in affected_camis)})"
+    else:
+        logger.info("No affected CAMISes provided — embedding all restaurants...")
+        camis_filter = ""
+    
+    # Fetch violation text for affected restaurants
+    query = f"""
         SELECT 
             camis,
             STRING_AGG(violation_description, ' | ') as violation_text
         FROM inspections
         WHERE violation_description IS NOT NULL
+        {camis_filter}
         GROUP BY camis
     """
     df = pd.read_sql(query, engine)
-    print(f"Found {len(df)} restaurants with violations")
-
-    # Generate embeddings
-    print("Generating embeddings...")
-    embeddings = model.encode(df['violation_text'].tolist(), show_progress_bar=True)
-
-    # Store in database
-    print("Storing embeddings...")
-    with engine.connect() as conn:
-        conn.execute(text("DELETE FROM violation_embeddings"))
-        for idx, row in df.iterrows():
-            conn.execute(text("""
-                INSERT INTO violation_embeddings (camis, violation_text, embedding)
-                VALUES (:camis, :violation_text, :embedding)
-            """), {
-                "camis": int(row['camis']),
-                "violation_text": row['violation_text'],
-                "embedding": embeddings[idx].tolist()
-            })
-        conn.commit()
-
-    print(f"Done. Stored embeddings for {len(df)} restaurants")
+    
+    if len(df) == 0:
+        logger.info("No restaurants to embed.")
+        return
+    
+    # Delete existing embeddings for affected restaurants
+    if affected_camis:
+        with engine.connect() as conn:
+            conn.execute(text(f"""
+                DELETE FROM violation_embeddings 
+                WHERE camis IN ({','.join(str(c) for c in affected_camis)})
+            """))
+            conn.commit()
+        logger.info(f"Deleted old embeddings for {len(affected_camis)} restaurants")
+    
+    # Generate new embeddings in batches
+    batch_size = 2048
+    total = len(df)
+    df = df.reset_index(drop=True)
+    
+    for i in range(0, total, batch_size):
+        batch = df.iloc[i:i+batch_size]
+        
+        try:
+            response = client.embeddings.create(
+                model="text-embedding-3-small",
+                input=[str(text)[:8000] for text in batch['violation_text'].tolist()]
+            )
+            
+            embeddings = [item.embedding for item in response.data]
+            
+            with engine.connect() as conn:
+                for j, (_, row) in enumerate(batch.iterrows()):
+                    conn.execute(text("""
+                        INSERT INTO violation_embeddings (camis, violation_text, embedding)
+                        VALUES (:camis, :violation_text, :embedding)
+                    """), {
+                        "camis": int(row['camis']),
+                        "violation_text": row['violation_text'],
+                        "embedding": str(embeddings[j])
+                    })
+                conn.commit()
+            
+            logger.info(f"Embedded {min(i + batch_size, total)}/{total} restaurants...")
+        
+        except Exception as e:
+            logger.warning(f"Batch {i}-{i+batch_size} failed: {e}. Retrying one by one...")
+            for _, row in batch.iterrows():
+                try:
+                    response = client.embeddings.create(
+                        model="text-embedding-3-small",
+                        input=str(row['violation_text'])[:8000]
+                    )
+                    embedding = response.data[0].embedding
+                    with engine.connect() as conn:
+                        conn.execute(text("""
+                            INSERT INTO violation_embeddings (camis, violation_text, embedding)
+                            VALUES (:camis, :violation_text, :embedding)
+                        """), {
+                            "camis": int(row['camis']),
+                            "violation_text": row['violation_text'],
+                            "embedding": str(embedding)
+                        })
+                        conn.commit()
+                except Exception as e2:
+                    logger.warning(f"Failed CAMIS {row['camis']}: {e2}")
+    
+    logger.info(f"Embedding update complete. Processed {total} restaurants.")
 
 
 def normalize(series, invert=False):
@@ -417,7 +468,9 @@ def main():
             
             # Step 4 - Compute violation embeddings
             logger.info("Step 4/5: Computing violation embeddings...")
-            compute_violation_embeddings()
+            affected_camis = set(df['CAMIS'].dropna().astype(int).unique()) # Track which restaurants are affected
+            logger.info(f"{len(affected_camis)} restaurants affected by new data")
+            compute_violation_embeddings(affected_camis=affected_camis)
             logger.info("✓ Embeddings computed")
             
             # Step 5 - Calculate risk scores

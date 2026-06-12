@@ -2,7 +2,7 @@ from app.schemas import AIInsights, ChatRequest, ChatResponse, HomeResponse, Res
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import Optional
 from app.database import get_db
 from app.services.restaurant_service import get_restaurant_detail, get_restaurants_service, get_home_data, get_bubble_data
 from app.services.chatbot_service import chat

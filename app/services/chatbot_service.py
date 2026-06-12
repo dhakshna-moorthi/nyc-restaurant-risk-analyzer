@@ -4,7 +4,7 @@ from openai import OpenAI
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from dotenv import load_dotenv
-from sentence_transformers import SentenceTransformer
+from app.services.rag_service import get_embedding
 
 load_dotenv()
 
@@ -210,8 +210,7 @@ def chat(question: str, db: Session, conversation_history: list = None) -> dict:
     
     if query_type == "semantic":
         search_text = routing.get("search_text") or question
-        model = SentenceTransformer('all-MiniLM-L6-v2')
-        embedding = model.encode(search_text).tolist()
+        embedding = get_embedding(search_text)
 
         db.rollback()
         

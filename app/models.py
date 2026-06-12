@@ -49,4 +49,4 @@ class ViolationEmbedding(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     camis = Column(BigInteger, ForeignKey("restaurants.camis"))
     violation_text = Column(Text)
-    embedding = Column(Vector(384))
+    embedding = Column(Vector(1536))

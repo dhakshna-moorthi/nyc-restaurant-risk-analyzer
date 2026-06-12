@@ -1,12 +1,22 @@
-from sentence_transformers import SentenceTransformer
+from openai import OpenAI
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+import os
+from dotenv import load_dotenv
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def get_embedding(text: str) -> list:
+    response = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text
+    )
+    return response.data[0].embedding
 
 def get_similar_restaurants(camis: int, violation_text: str, db: Session, limit: int = 10):
-    embedding = model.encode(violation_text).tolist()
-    embedding_str = str(embedding)
+    embedding = get_embedding(violation_text)
     
     results = db.execute(text("""
         SELECT 
@@ -25,7 +35,7 @@ def get_similar_restaurants(camis: int, violation_text: str, db: Session, limit:
         ORDER BY ve.embedding <=> CAST(:embedding AS vector)
         LIMIT :limit
     """), {
-        "embedding": embedding_str,
+        "embedding": str(embedding),
         "camis": camis,
         "limit": limit
     }).fetchall()
