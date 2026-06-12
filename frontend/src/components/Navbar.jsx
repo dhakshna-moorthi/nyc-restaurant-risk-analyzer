@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import '../styles/shared.css'
 
@@ -31,56 +31,56 @@ function NavLink({ to, children }) {
 
 export function Header() {
   const navigate = useNavigate()
+  const [dark, setDark] = useState(() => localStorage.getItem('safeplate_theme') === 'dark')
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    localStorage.setItem('safeplate_theme', dark ? 'dark' : 'light')
+  }, [dark])
+
+  const handleLogout = () => {
+    localStorage.removeItem('safeplate_token')
+    navigate('/login')
+    setMenuOpen(false)
+  }
+
   return (
-    <header
-      style={{
-        backgroundColor: '#1a2744',
-        padding: '16px 0',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
-      <div
-        onClick={() => navigate('/')}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2px',
-          paddingLeft: '24px',
-          cursor: 'pointer',
-        }}
-      >
-        <span style={{ color: '#ffffff', fontWeight: '700', fontSize: '22px', lineHeight: 1.2 }}>
-          SafePlate
-        </span>
-        <span style={{ color: '#9ca3af', fontSize: '13px' }}>
-          NYC Restaurant Health Risk Inspection Portal
-        </span>
+    <header className="site-header">
+      <div className="site-header-logo" onClick={() => navigate('/')}>
+        <span className="site-header-title">SafePlate</span>
+        <span className="site-header-subtitle">NYC Restaurant Health Risk Inspection Portal</span>
       </div>
-      <nav style={{ display: 'flex', alignItems: 'center', paddingRight: '24px', gap: '4px' }}>
+
+      {/* Desktop navigation */}
+      <nav className="nav-desktop-links">
         <NavLink to="/dashboard">Dashboard</NavLink>
         <NavLink to="/chat">Chatbot</NavLink>
-        <button
-          onClick={() => {
-            localStorage.removeItem('safeplate_token')
-            navigate('/login')
-          }}
-          style={{
-            marginLeft: '12px',
-            padding: '7px 16px',
-            fontSize: '13px',
-            fontFamily: "'Inter', sans-serif",
-            backgroundColor: 'transparent',
-            color: '#ffffff',
-            border: '1px solid rgba(255,255,255,0.35)',
-            borderRadius: '6px',
-            cursor: 'pointer',
-          }}
-        >
-          Logout
-        </button>
+        <div className="nav-theme-toggle">
+          <button className={`nav-theme-btn${!dark ? ' active' : ''}`} onClick={() => setDark(false)}>Light</button>
+          <button className={`nav-theme-btn${dark ? ' active' : ''}`} onClick={() => setDark(true)}>Dark</button>
+        </div>
+        <button className="btn-logout" onClick={handleLogout}>Logout</button>
       </nav>
+
+      {/* Hamburger button — mobile only */}
+      <button className="nav-hamburger" onClick={() => setMenuOpen((o) => !o)}>☰</button>
+
+      {/* Mobile dropdown */}
+      {menuOpen && (
+        <div className="nav-mobile-dropdown">
+          <button className="nav-mobile-item" onClick={() => { navigate('/dashboard'); setMenuOpen(false) }}>Dashboard</button>
+          <button className="nav-mobile-item" onClick={() => { navigate('/chat'); setMenuOpen(false) }}>Chatbot</button>
+          <hr className="nav-mobile-divider" />
+          <div className="nav-mobile-theme">
+            <span>Theme:</span>
+            <button className={`nav-mobile-theme-btn${!dark ? ' active' : ''}`} onClick={() => setDark(false)}>Light</button>
+            <button className={`nav-mobile-theme-btn${dark ? ' active' : ''}`} onClick={() => setDark(true)}>Dark</button>
+          </div>
+          <hr className="nav-mobile-divider" />
+          <button className="nav-mobile-item" onClick={handleLogout}>Logout</button>
+        </div>
+      )}
     </header>
   )
 }

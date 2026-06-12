@@ -27,10 +27,10 @@ const INSP_COLUMNS = [
 // ── Sub-components ─────────────────────────────────────────────────────────
 function InspectionRow({ row, index }) {
   const [hovered, setHovered] = useState(false)
-  const baseColor = index % 2 === 0 ? '#ffffff' : '#f9fafb'
+  const baseColor = index % 2 === 0 ? 'var(--bg-card)' : 'var(--table-alt-row)'
   return (
     <tr
-      style={{ backgroundColor: hovered ? '#eef2f7' : baseColor }}
+      style={{ backgroundColor: hovered ? 'var(--table-hover)' : baseColor }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -39,7 +39,7 @@ function InspectionRow({ row, index }) {
           key={col.key}
           style={{
             padding: '9px 14px',
-            borderBottom: '1px solid #f3f4f6',
+            borderBottom: '1px solid var(--border-color)',
             whiteSpace: col.key === 'violation_description' ? 'normal' : 'nowrap',
             maxWidth: col.key === 'violation_description' ? '280px' : undefined,
           }}
@@ -72,21 +72,21 @@ function InspectionHistory({ inspections, inspPage, setInspPage, inspLoading }) 
     fontSize: '14px',
     fontFamily: "'Inter', sans-serif",
     borderRadius: '6px',
-    border: '1px solid #d1d5db',
-    backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-    color: disabled ? '#9ca3af' : '#2c3e50',
+    border: '1px solid var(--border-color)',
+    backgroundColor: disabled ? 'var(--table-alt-row)' : 'var(--bg-card)',
+    color: disabled ? 'var(--text-secondary)' : 'var(--text-primary)',
     cursor: disabled ? 'not-allowed' : 'pointer',
   })
 
   return (
     <div className="card" style={{ marginTop: '24px' }}>
       <div className="card-title">Inspection History</div>
-      <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
+      <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
         {total} violation records across {unique_inspections} inspections
       </div>
 
       {data.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '40px 16px', color: '#6b7280', fontSize: '13px' }}>
+        <div style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--text-secondary)', fontSize: '13px' }}>
           No inspection records found.
         </div>
       ) : (
@@ -103,7 +103,7 @@ function InspectionHistory({ inspections, inspPage, setInspPage, inspLoading }) 
               <tbody>
                 {inspLoading ? (
                   <tr>
-                    <td colSpan={INSP_COLUMNS.length} style={{ textAlign: 'center', padding: '40px 14px', color: '#6b7280' }}>
+                    <td colSpan={INSP_COLUMNS.length} style={{ textAlign: 'center', padding: '40px 14px', color: 'var(--text-secondary)' }}>
                       Loading...
                     </td>
                   </tr>
@@ -117,7 +117,7 @@ function InspectionHistory({ inspections, inspPage, setInspPage, inspLoading }) 
           </div>
 
           <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '13px', color: '#6b7280' }}>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
               {total > 0 && `Showing ${firstItem}–${lastItem} of ${total} violation records`}
             </span>
             {totalPages > 1 && (
@@ -129,7 +129,7 @@ function InspectionHistory({ inspections, inspPage, setInspPage, inspLoading }) 
                 >
                   ← Previous
                 </button>
-                <span style={{ fontSize: '13px', color: '#6b7280' }}>
+                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                   Page {inspPage} of {totalPages}
                 </span>
                 <button
@@ -162,7 +162,7 @@ function InsightContent({ insights }) {
       {/* Risk Assessment */}
       <div>
         <div className="insight-label">Risk Assessment</div>
-        <div style={{ fontSize: '14px', color: '#374151', lineHeight: '1.6' }}>
+        <div style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
           {narrText}{!narrDone && <Cursor />}
         </div>
       </div>
@@ -174,18 +174,18 @@ function InsightContent({ insights }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div className="insight-rec">
               <span className="insight-rec-badge">1</span>
-              <span style={{ fontSize: '14px', color: '#374151', lineHeight: '1.5' }}>{r0Text}{!r0Done && <Cursor />}</span>
+              <span style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: '1.5' }}>{r0Text}{!r0Done && <Cursor />}</span>
             </div>
             {r0Done && (
               <div className="insight-rec">
                 <span className="insight-rec-badge">2</span>
-                <span style={{ fontSize: '14px', color: '#374151', lineHeight: '1.5' }}>{r1Text}{!r1Done && <Cursor />}</span>
+                <span style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: '1.5' }}>{r1Text}{!r1Done && <Cursor />}</span>
               </div>
             )}
             {r1Done && (
               <div className="insight-rec">
                 <span className="insight-rec-badge">3</span>
-                <span style={{ fontSize: '14px', color: '#374151', lineHeight: '1.5' }}>{r2Text}{!r2Done && <Cursor />}</span>
+                <span style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: '1.5' }}>{r2Text}{!r2Done && <Cursor />}</span>
               </div>
             )}
           </div>
@@ -197,7 +197,7 @@ function InsightContent({ insights }) {
         <div>
           <div className="insight-label">Pattern Insight</div>
           <div className="insight-pattern">
-            <span style={{ fontSize: '14px', color: '#374151', lineHeight: '1.5' }}>
+            <span style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: '1.5' }}>
               {patText}{!patDone && <Cursor />}
             </span>
           </div>
@@ -244,13 +244,13 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
 
   return (
     <div className="card" style={{ marginTop: '24px' }}>
-      <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a2744', marginBottom: '20px' }}>
+      <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '20px' }}>
         Risk Analysis
       </div>
 
       {/* Comparison to similar restaurants */}
       <div style={{ marginBottom: '24px' }}>
-        <div style={{ fontSize: '14px', fontWeight: '700', color: '#1a2744', marginBottom: '12px' }}>
+        <div style={{ fontSize: '14px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '12px' }}>
           Comparison to Similar Restaurants
         </div>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
@@ -265,7 +265,7 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
       </div>
 
       {/* 2×2 grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+      <div className="risk-analysis-grid">
 
         {/* Repeat Violations */}
         <div className="sub-card">
@@ -276,7 +276,7 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
             <div style={{ fontSize: '13px', color: '#9ca3af' }}>No repeat violations found</div>
           ) : (
             <div style={{ maxHeight: '200px', overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: '#d1d5db #f9fafb' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#2c3e50' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--text-primary)' }}>
                 <thead>
                   <tr>
                     {['Violation Code', 'Times Cited'].map((h) => (
@@ -285,7 +285,7 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
                         style={{
                           textAlign: 'left',
                           padding: '0 8px 8px 0',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           fontWeight: '600',
                           fontSize: '11px',
                           textTransform: 'uppercase',
@@ -299,7 +299,7 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
                 </thead>
                 <tbody>
                   {repeat_violations.map((rv, i) => (
-                    <tr key={i} style={{ borderTop: '1px solid #f3f4f6' }}>
+                    <tr key={i} style={{ borderTop: '1px solid var(--border-color)' }}>
                       <td style={{ padding: '7px 8px 7px 0', fontWeight: '600' }}>{rv.violation_code}</td>
                       <td style={{ padding: '7px 8px 7px 0' }}>{rv.occurrence_count}</td>
                     </tr>
@@ -356,9 +356,9 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '25px' }}>
                   {segments.map((seg, i) => (
-                    <span key={i} style={{ fontSize: '12px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span key={i} style={{ fontSize: '12px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ color: seg.color, fontSize: '15px', lineHeight: 1 }}>&#9632;</span>
-                      {seg.label} <span style={{ color: '#1a2744', fontWeight: '600' }}>{seg.pct.toFixed(1)}%</span>
+                      {seg.label} <span style={{ color: 'var(--heading-color)', fontWeight: '600' }}>{seg.pct.toFixed(1)}%</span>
                     </span>
                   ))}
                 </div>
@@ -378,10 +378,10 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
           ) : (
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={score_trend} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <XAxis dataKey="inspection_date" tickFormatter={fmtDate} tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v) => [v, 'Score']} labelFormatter={fmtDate} contentStyle={{ fontSize: '12px' }} />
-                <Line type="monotone" dataKey="score" stroke="#1a2744" strokeWidth={2} dot={{ r: 3 }} />
+                <XAxis dataKey="inspection_date" tickFormatter={fmtDate} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
+                <Tooltip formatter={(v) => [v, 'Score']} labelFormatter={fmtDate} contentStyle={{ fontSize: '12px', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} />
+                <Line type="monotone" dataKey="score" stroke="var(--heading-color)" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           )}
@@ -395,9 +395,9 @@ function RiskMetrics({ metrics, boro, cuisine, uniqueInspections }) {
           ) : (
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={violation_trend} margin={{ top: 4, right: 8, bottom: 4, left: -20 }}>
-                <XAxis dataKey="inspection_date" tickFormatter={fmtDate} tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-                <Tooltip formatter={(v) => [v, 'Violations']} labelFormatter={fmtDate} contentStyle={{ fontSize: '12px' }} />
+                <XAxis dataKey="inspection_date" tickFormatter={fmtDate} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
+                <YAxis tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} allowDecimals={false} />
+                <Tooltip formatter={(v) => [v, 'Violations']} labelFormatter={fmtDate} contentStyle={{ fontSize: '12px', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} />
                 <Bar dataKey="violation_count" fill="#e67e22" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -518,16 +518,16 @@ function RestaurantDetail({ camis }) {
 
           <div style={{ padding: '0 24px 24px' }}>
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '80px 16px', color: '#6b7280', fontSize: '14px' }}>
+              <div style={{ textAlign: 'center', padding: '80px 16px', color: 'var(--text-secondary)', fontSize: '14px' }}>
                 Loading restaurant details...
               </div>
             ) : error === 'not_found' ? (
               <div style={{ textAlign: 'center', padding: '80px 16px' }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
-                <div style={{ fontSize: '20px', fontWeight: '700', color: '#1a2744', marginBottom: '8px' }}>
+                <div style={{ fontSize: '20px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '8px' }}>
                   Restaurant Not Found
                 </div>
-                <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '24px' }}>
+                <div style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
                   No restaurant with CAMIS <strong>{camis}</strong> exists in the database.
                 </div>
                 <button
@@ -544,7 +544,7 @@ function RestaurantDetail({ camis }) {
             ) : (
               <>
                 <div className="card">
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a2744', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '20px' }}>
                     Restaurant Information
                   </div>
                   <div className="info-grid">
@@ -584,6 +584,7 @@ function RestaurantDetail({ camis }) {
         {/* AI Insights side panel */}
         <div
           className="ai-panel-outer"
+          data-open={panelOpen ? 'true' : 'false'}
           style={{ width: panelOpen ? '420px' : '0' }}
         >
           <div className="ai-panel-inner">
@@ -609,12 +610,12 @@ function RestaurantDetail({ camis }) {
                     style={{
                       width: '36px',
                       height: '36px',
-                      border: '3px solid #e5e7eb',
-                      borderTop: '3px solid #1a2744',
+                      border: '3px solid var(--border-color)',
+                      borderTop: '3px solid var(--heading-color)',
                       borderRadius: '50%',
                     }}
                   />
-                  <div style={{ color: '#2c3e50', fontSize: '14px', fontWeight: '600', textAlign: 'center' }}>
+                  <div style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: '600', textAlign: 'center' }}>
                     Analyzing inspection patterns...
                   </div>
                   <div style={{ color: '#9ca3af', fontSize: '12px', textAlign: 'center' }}>

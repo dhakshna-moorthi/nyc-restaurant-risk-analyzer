@@ -20,6 +20,10 @@
   text-underline-offset: 2px;
 }
 
+[data-theme="dark"] .breadcrumb-link {
+  color: #ffffff;
+}
+
 /* Info grid */
 .info-grid {
   display: grid;
@@ -33,6 +37,10 @@
   border-collapse: collapse;
   font-size: 13px;
   color: #2c3e50;
+}
+
+[data-theme="dark"] .insp-table {
+  color: var(--text-primary);
 }
 
 .insp-table thead tr {
@@ -52,6 +60,10 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
+[data-theme="dark"] .insp-table tbody td {
+  border-bottom-color: var(--border-color);
+}
+
 /* AI side panel */
 .ai-panel-outer {
   flex-shrink: 0;
@@ -62,8 +74,8 @@
 .ai-panel-inner {
   width: 420px;
   height: 100%;
-  background-color: #ffffff;
-  border-left: 1px solid #e5e7eb;
+  background-color: var(--bg-card);
+  border-left: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
 }
@@ -89,10 +101,10 @@
 
 /* Risk metrics sub-cards */
 .sub-card {
-  background-color: #f9fafb;
+  background-color: var(--table-alt-row);
   border-radius: 6px;
   padding: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
 }
 
 .sub-card-title {
@@ -100,6 +112,10 @@
   font-weight: 700;
   color: #1a2744;
   margin-bottom: 12px;
+}
+
+[data-theme="dark"] .sub-card-title {
+  color: #ffffff;
 }
 
 /* Comparison stat tiles */
@@ -142,8 +158,12 @@
   margin-bottom: 8px;
 }
 
+[data-theme="dark"] .insight-label {
+  color: #ffffff;
+}
+
 .insight-rec {
-  background-color: #eef2f7;
+  background-color: var(--table-hover);
   padding: 12px;
   border-radius: 6px;
   display: flex;
@@ -170,4 +190,54 @@
   border-left: 3px solid #e67e22;
   padding: 12px;
   border-radius: 0 6px 6px 0;
+}
+
+[data-theme="dark"] .insight-pattern {
+  background-color: var(--table-hover);
+}
+
+/* ── Responsive: Tablet 768px – 1023px ────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .info-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* ── Responsive: Mobile < 768px ────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* AI panel becomes a full-screen overlay on mobile */
+  .ai-panel-outer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    z-index: 1000;
+    overflow: hidden;
+  }
+
+  .ai-panel-outer[data-open="false"] {
+    width: 0 !important;
+  }
+
+  .ai-panel-outer[data-open="true"] {
+    width: 100vw !important;
+  }
+
+  .ai-panel-inner {
+    width: 100vw !important;
+  }
+
+  /* Inspection table */
+  .insp-table {
+    font-size: 12px;
+  }
+
+  /* Comparison tiles: 2 per row on mobile */
+  .comparison-tile {
+    width: auto;
+  }
 }

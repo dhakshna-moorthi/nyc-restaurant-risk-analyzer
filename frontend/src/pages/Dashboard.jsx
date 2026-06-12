@@ -65,9 +65,9 @@ function paginationButtonStyle(disabled) {
     fontSize: '14px',
     fontFamily: "'Inter', sans-serif",
     borderRadius: '6px',
-    border: '1px solid #d1d5db',
-    backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-    color: disabled ? '#9ca3af' : '#2c3e50',
+    border: '1px solid var(--border-color)',
+    backgroundColor: disabled ? 'var(--table-alt-row)' : 'var(--bg-card)',
+    color: disabled ? 'var(--text-secondary)' : 'var(--text-primary)',
     cursor: disabled ? 'not-allowed' : 'pointer',
   }
 }
@@ -77,11 +77,11 @@ function RestaurantRow({ row, index }) {
   const [hovered, setHovered] = useState(false)
   const navigate  = useNavigate()
   const location  = useLocation()
-  const baseColor = index % 2 === 0 ? '#ffffff' : '#f9fafb'
+  const baseColor = index % 2 === 0 ? 'var(--bg-card)' : 'var(--table-alt-row)'
 
   return (
     <tr
-      style={{ backgroundColor: hovered ? '#eef2f7' : baseColor, cursor: 'pointer' }}
+      style={{ backgroundColor: hovered ? 'var(--table-hover)' : baseColor, cursor: 'pointer' }}
       onClick={() => navigate(`/restaurants/${row.camis}`, { state: { dashboardSearch: location.search } })}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -89,12 +89,14 @@ function RestaurantRow({ row, index }) {
       {COLUMNS.map((col) => (
         <td
           key={col.key}
+          data-col={col.key}
+          className={(col.key === 'camis' || col.key === 'restaurant_name') ? 'sticky-col' : undefined}
           style={{
             padding: '10px 16px',
-            borderBottom: '1px solid #f3f4f6',
+            borderBottom: '1px solid var(--border-color)',
             whiteSpace: 'nowrap',
-            ...(col.key === 'camis' ? { borderLeft: hovered ? '3px solid #1a2744' : '3px solid transparent' } : {}),
-            ...stickyTdStyle(col.key, hovered ? '#eef2f7' : baseColor),
+            ...(col.key === 'camis' ? { borderLeft: hovered ? '3px solid var(--heading-color)' : '3px solid transparent' } : {}),
+            ...stickyTdStyle(col.key, hovered ? 'var(--table-hover)' : baseColor),
           }}
         >
           {col.key === 'criticality' ? (
@@ -118,23 +120,23 @@ function BubbleTooltip({ active, payload }) {
   if (!d) return null
   return (
     <div style={{
-      background: '#fff',
-      border: '1.5px solid #1a2744',
+      background: 'var(--bg-card)',
+      border: '1.5px solid var(--border-color)',
       borderRadius: '8px',
       padding: '12px',
       fontSize: '13px',
-      color: '#2c3e50',
+      color: 'var(--text-primary)',
       lineHeight: '1.7',
       maxWidth: '240px',
     }}>
-      <div style={{ fontWeight: '700', marginBottom: '4px', color: '#1a2744' }}>{d.restaurant_name ?? d.dba ?? '—'}</div>
-      <div><span style={{ color: '#6b7280' }}>Area:</span> {d.area ?? d.boro ?? '—'}</div>
-      <div><span style={{ color: '#6b7280' }}>Cuisine:</span> {d.cuisine_description}</div>
-      <div><span style={{ color: '#6b7280' }}>Risk Score:</span> {d.risk_score}</div>
-      <div><span style={{ color: '#6b7280' }}>Days Since Inspection:</span> {d.days_since_last_inspection}</div>
-      <div><span style={{ color: '#6b7280' }}>Criticality:</span> {d.criticality}</div>
-      <div><span style={{ color: '#6b7280' }}>Trend:</span> {d.trend}</div>
-      <div><span style={{ color: '#6b7280' }}>Critical Violations:</span> {d.critical_violation_count}</div>
+      <div style={{ fontWeight: '700', marginBottom: '4px', color: 'var(--heading-color)' }}>{d.restaurant_name ?? d.dba ?? '—'}</div>
+      <div><span style={{ color: 'var(--text-secondary)' }}>Area:</span> {d.area ?? d.boro ?? '—'}</div>
+      <div><span style={{ color: 'var(--text-secondary)' }}>Cuisine:</span> {d.cuisine_description}</div>
+      <div><span style={{ color: 'var(--text-secondary)' }}>Risk Score:</span> {d.risk_score}</div>
+      <div><span style={{ color: 'var(--text-secondary)' }}>Days Since Inspection:</span> {d.days_since_last_inspection}</div>
+      <div><span style={{ color: 'var(--text-secondary)' }}>Criticality:</span> {d.criticality}</div>
+      <div><span style={{ color: 'var(--text-secondary)' }}>Trend:</span> {d.trend}</div>
+      <div><span style={{ color: 'var(--text-secondary)' }}>Critical Violations:</span> {d.critical_violation_count}</div>
     </div>
   )
 }
@@ -152,6 +154,13 @@ function getSliderConfig(count) {
 function BubbleChart({ data, rawData, topN, onTopNChange }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)')
+    const handler = (e) => setIsMobile(e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
 
   const yExcluded = rawData.filter((r) => (r.days_since_last_inspection ?? 0) > Y_CAP)
   const xExcluded = rawData.filter((r) => r.risk_score > X_CAP)
@@ -186,7 +195,7 @@ function BubbleChart({ data, rawData, topN, onTopNChange }) {
 
   if (data.length === 0) {
     return (
-      <div style={{ height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontSize: '15px' }}>
+      <div style={{ height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '15px' }}>
         No restaurants match the current filters.
       </div>
     )
@@ -195,13 +204,13 @@ function BubbleChart({ data, rawData, topN, onTopNChange }) {
   return (
     <div>
       {/* Header row: title left, legend + notes right */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+      <div className="bubble-header-row">
         <div>
-          <div style={{ fontSize: '16px', fontWeight: '700', color: '#1a2744', marginBottom: '16px' }}>Restaurant Risk Overview</div>
+          <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '16px' }}>Restaurant Risk Overview</div>
           {rawData.length > 0 && (() => {
               const { step, max } = getSliderConfig(rawData.length)
               return (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#374151' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-primary)' }}>
                   <span style={{ fontWeight: '600', whiteSpace: 'nowrap' }}>Showing top</span>
                   <input
                     type="range"
@@ -210,47 +219,48 @@ function BubbleChart({ data, rawData, topN, onTopNChange }) {
                     step={step}
                     value={Math.min(topN, max)}
                     onChange={(e) => onTopNChange(Number(e.target.value))}
-                    style={{ width: '140px', accentColor: '#1a2744', cursor: 'pointer' }}
+                    style={{ width: '140px', accentColor: 'var(--heading-color)', cursor: 'pointer' }}
                   />
                   <span style={{ whiteSpace: 'nowrap', minWidth: '40px' }}>{Math.min(topN, rawData.length).toLocaleString()}</span>
                 </div>
               )
             })()}
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginBottom: '4px' }}>
+        <div className="bubble-meta">
+          <div className="bubble-legend">
             {['Declining', 'Improving', 'Stable'].map((level) => (
-              <span key={level} style={{ fontSize: '13px', color: '#2c3e50' }}>
+              <span key={level} style={{ fontSize: '13px', color: 'var(--text-primary)' }}>
                 <span style={{ color: TREND_COLORS[level], marginRight: '4px' }}>●</span>{level}
               </span>
             ))}
           </div>
-          <div style={{ fontSize: '11px', color: '#9ca3af', fontStyle: 'italic', lineHeight: '1.8' }}>
-            <div>Bubble size = critical violations count</div>
+          <div className="bubble-disclaimers">
+            <span>Bubble size = critical violations count</span>
             {yExcluded.length > 0 && (
-              <div>Not inspected for 750+ days — {yExcluded.length} restaurant{yExcluded.length !== 1 ? 's' : ''} excluded </div>
+              <span>Not inspected for 750+ days — {yExcluded.length} restaurant{yExcluded.length !== 1 ? 's' : ''} excluded</span>
             )}
-            <div>risk score above 75 — {xExcluded.length} restaurant{xExcluded.length !== 1 ? 's' : ''} excluded</div>
+            <span>risk score above 75 — {xExcluded.length} restaurant{xExcluded.length !== 1 ? 's' : ''} excluded</span>
           </div>
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={500}>
-        <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 80 }}>
+      <div className="bubble-chart-wrapper">
+      <ResponsiveContainer width="100%" height="100%">
+        <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: isMobile ? 40 : 80 }}>
           <XAxis
             type="number"
             dataKey="x"
             name="Risk Score"
             domain={[0, X_CAP]}
-            label={{ value: 'Risk Score', position: 'insideBottom', offset: -40, fontSize: 13, fill: '#6b7280' }}
-            tick={{ fontSize: 12, fill: '#6b7280' }}
+            label={{ value: 'Risk Score', position: 'insideBottom', offset: -40, fontSize: 13, fill: 'var(--text-secondary)' }}
+            tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
           />
           <YAxis
             type="number"
             dataKey="y"
             name="Days Since Inspection"
-            label={{ value: 'Days Since Inspection', angle: -90, position: 'insideLeft', dx: -10, fontSize: 13, fill: '#6b7280' }}
-            tick={{ fontSize: 12, fill: '#6b7280' }}
+            label={{ value: 'Days Since Inspection', angle: -90, position: 'insideLeft', dx: -10, fontSize: 13, fill: 'var(--text-secondary)' }}
+            tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
           />
           <ZAxis type="number" dataKey="z" range={[40, 400]} name="Critical Violations" />
           <Tooltip content={<BubbleTooltip />} cursor={{ strokeDasharray: '3 3' }} />
@@ -279,6 +289,7 @@ function BubbleChart({ data, rawData, topN, onTopNChange }) {
           ))}
         </ScatterChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }
@@ -297,6 +308,16 @@ export default function RestaurantList() {
   const page        = Number(searchParams.get('page')  ?? 1)
   const view        = searchParams.get('view')         ?? 'list'
   const topN        = Number(searchParams.get('top_n')   ?? 1000)
+
+  const [dark, setDark] = useState(() => document.documentElement.getAttribute('data-theme') === 'dark')
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setDark(document.documentElement.getAttribute('data-theme') === 'dark')
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
 
   const [debouncedSearch, setDebouncedSearch]   = useState(search)
   const [debouncedCuisine, setDebouncedCuisine] = useState(cuisine)
@@ -493,48 +514,53 @@ export default function RestaurantList() {
         </select>
 
         {/* Segmented toggle — pushed to right */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ display: 'flex', border: '1.5px solid #1a2744', borderRadius: '20px', overflow: 'hidden' }}>
-            <button
+        <div className="filter-bar-view-toggle" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            border: dark ? '1px solid rgba(255,255,255,0.3)' : '1px solid #1a2744',
+            borderRadius: '20px',
+            padding: '2px',
+          }}>
+            <span
               onClick={() => { if (isBubble) toggleView() }}
               style={{
-                padding: '7px 18px',
-                fontSize: '13px',
-                fontFamily: "'Inter', sans-serif",
-                border: 'none',
-                borderRight: '1px solid #1a2744',
-                backgroundColor: !isBubble ? '#1a2744' : '#ffffff',
-                color: !isBubble ? '#ffffff' : '#1a2744',
+                backgroundColor: !isBubble ? (dark ? '#ffffff' : '#1a2744') : 'transparent',
+                color: !isBubble ? (dark ? '#1a2744' : '#ffffff') : (dark ? 'rgba(255,255,255,0.7)' : 'rgba(26,39,68,0.6)'),
+                borderRadius: '18px',
+                padding: '4px 12px',
+                fontSize: '12px',
                 cursor: 'pointer',
-                fontWeight: '600',
+                transition: 'all 0.2s ease',
+                userSelect: 'none',
                 whiteSpace: 'nowrap',
               }}
             >
               List View
-            </button>
-            <button
+            </span>
+            <span
               onClick={() => { if (!isBubble) toggleView() }}
               style={{
-                padding: '7px 18px',
-                fontSize: '13px',
-                fontFamily: "'Inter', sans-serif",
-                border: 'none',
-                backgroundColor: isBubble ? '#1a2744' : '#ffffff',
-                color: isBubble ? '#ffffff' : '#1a2744',
+                backgroundColor: isBubble ? (dark ? '#ffffff' : '#1a2744') : 'transparent',
+                color: isBubble ? (dark ? '#1a2744' : '#ffffff') : (dark ? 'rgba(255,255,255,0.7)' : 'rgba(26,39,68,0.6)'),
+                borderRadius: '18px',
+                padding: '4px 12px',
+                fontSize: '12px',
                 cursor: 'pointer',
-                fontWeight: '600',
+                transition: 'all 0.2s ease',
+                userSelect: 'none',
                 whiteSpace: 'nowrap',
               }}
             >
               Bubble View
-            </button>
+            </span>
           </div>
         </div>
       </div>
 
       {/* Summary stats */}
       <div style={{ padding: '0 24px' }}>
-        <div style={{ display: 'flex', gap: '16px', marginBottom: isBubble ? '24px' : '16px' }}>
+        <div className="kpi-strip" style={{ marginBottom: isBubble ? '24px' : '16px' }}>
           {(() => {
             const pct = (n) => !loading && kpis && total > 0 ? `(${((n / total) * 100).toFixed(1)}% of total)` : null
             return (
@@ -553,9 +579,9 @@ export default function RestaurantList() {
       {/* Bubble chart view */}
       {isBubble && (
         <div style={{ padding: '0 24px 24px', marginTop: '32px' }}>
-          <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
             {bubbleLoading ? (
-              <div style={{ height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontSize: '15px' }}>
+              <div style={{ height: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', fontSize: '15px' }}>
                 Loading…
               </div>
             ) : bubbleError ? (
@@ -599,8 +625,10 @@ export default function RestaurantList() {
                   {COLUMNS.map((col) => (
                     <th
                       key={col.key}
+                      data-col={col.key}
                       onClick={() => handleColumnSort(col.key)}
                       style={stickyThStyle(col.key)}
+                      className={(col.key === 'camis' || col.key === 'restaurant_name') ? 'sticky-col' : undefined}
                     >
                       {col.label}
                       <span style={{ marginLeft: '6px', color: sortBy === col.key ? '#ffffff' : 'rgba(255,255,255,0.35)' }}>
@@ -613,7 +641,7 @@ export default function RestaurantList() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={COLUMNS.length} style={{ textAlign: 'center', padding: '64px 16px', color: '#6b7280' }}>
+                    <td colSpan={COLUMNS.length} style={{ textAlign: 'center', padding: '64px 16px', color: 'var(--text-secondary)' }}>
                       Loading restaurants...
                     </td>
                   </tr>
@@ -625,7 +653,7 @@ export default function RestaurantList() {
                   </tr>
                 ) : restaurants.length === 0 ? (
                   <tr>
-                    <td colSpan={COLUMNS.length} style={{ textAlign: 'center', padding: '64px 16px', color: '#6b7280' }}>
+                    <td colSpan={COLUMNS.length} style={{ textAlign: 'center', padding: '64px 16px', color: 'var(--text-secondary)' }}>
                       No restaurants found.
                     </td>
                   </tr>
@@ -648,7 +676,7 @@ export default function RestaurantList() {
               >
                 ← Previous
               </button>
-              <span style={{ fontSize: '14px', color: '#6b7280' }}>
+              <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                 Page {page} of {totalPages}
               </span>
               <button

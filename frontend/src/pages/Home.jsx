@@ -82,10 +82,10 @@ function DailyBriefingCard({ loading, briefing = [] }) {
 
 function UrgentRow({ row, index, onClick }) {
   const [hovered, setHovered] = useState(false)
-  const baseColor = index % 2 === 0 ? '#ffffff' : '#f9fafb'
+  const baseColor = index % 2 === 0 ? 'var(--bg-card)' : 'var(--table-alt-row)'
   return (
     <tr
-      style={{ backgroundColor: hovered ? '#eef2f7' : baseColor, cursor: 'pointer' }}
+      style={{ backgroundColor: hovered ? 'var(--table-hover)' : baseColor, cursor: 'pointer' }}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -93,7 +93,7 @@ function UrgentRow({ row, index, onClick }) {
       {URGENT_COLUMNS.map((col) => (
         <td
           key={col.key}
-          style={{ padding: '10px 14px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}
+          style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-color)', whiteSpace: 'nowrap' }}
         >
           {col.key === 'criticality' ? (
             <CriticalityBadge value={row[col.key]} />
@@ -152,20 +152,20 @@ export default function HomePage() {
       <Header />
 
       <div style={{ padding: '24px' }}>
-        <div style={{ fontSize: '28px', fontWeight: '700', color: '#1a2744', marginBottom: '24px' }}>
+        <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '24px' }}>
           Overview
         </div>
 
         {loading ? (
           <>
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+            <div className="kpi-strip" style={{ marginBottom: '24px' }}>
               <StatCard label="Total Restaurants" value="—" />
               <StatCard label="High Risk Restaurants" value="—" />
               <StatCard label="Overdue for Inspection" value="—" />
               <StatCard label="Avg Risk Score" value="—" />
             </div>
             <DailyBriefingCard loading={true} briefing={[]} />
-            <div style={{ textAlign: 'center', padding: '40px 16px', color: '#6b7280', fontSize: '14px' }}>
+            <div style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--text-secondary)', fontSize: '14px' }}>
               Loading...
             </div>
           </>
@@ -176,7 +176,7 @@ export default function HomePage() {
         ) : data ? (
           <>
             {/* Stats strip */}
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
+            <div className="kpi-strip" style={{ marginBottom: '24px' }}>
               {(() => {
                 const total = data.stats?.total_restaurants ?? 0
                 const pct = (n) => total > 0 ? `(${((n / total) * 100).toFixed(1)}% of total)` : null
@@ -201,7 +201,7 @@ export default function HomePage() {
                 High risk restaurants overdue for inspection (180+ days)
               </div>
               <div style={{ overflowX: 'auto', borderRadius: '6px' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#2c3e50' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: 'var(--text-primary)' }}>
                   <thead>
                     <tr style={{ backgroundColor: '#1a2744' }}>
                       {URGENT_COLUMNS.map((col) => (
@@ -225,7 +225,7 @@ export default function HomePage() {
                       <tr>
                         <td
                           colSpan={URGENT_COLUMNS.length}
-                          style={{ textAlign: 'center', padding: '40px 14px', color: '#6b7280' }}
+                          style={{ textAlign: 'center', padding: '40px 14px', color: 'var(--text-secondary)' }}
                         >
                           No restaurants require immediate attention.
                         </td>
@@ -297,7 +297,7 @@ export default function HomePage() {
                 verticalAlign: 'middle',
                 backgroundColor: getHeatmapColor(pct, maxPercentage),
                 color: '#1a1a1a',
-                border: '1px solid #f3f4f6',
+                border: '1px solid var(--border-color)',
                 whiteSpace: 'nowrap',
               })
 
@@ -310,7 +310,7 @@ export default function HomePage() {
 
               return (
                 <div className="card" style={{ marginBottom: '16px' }}>
-                  <div style={{ fontSize: '15px', fontWeight: '700', color: '#1a2744', marginBottom: '2px' }}>
+                  <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '2px' }}>
                     High Risk Restaurants: Borough vs Cuisine
                   </div>
                   <div style={{ fontSize: '11px', color: '#9ca3af', fontStyle: 'italic', marginBottom: '14px' }}>
@@ -339,7 +339,7 @@ export default function HomePage() {
                           const bPct   = safePct(bTotal.high_risk_percentage)
                           return (
                             <tr key={boro}>
-                              <td style={{ padding: '6px 8px', fontWeight: '700', color: '#2c3e50', fontSize: '11px', whiteSpace: 'nowrap' }}>
+                              <td style={{ padding: '6px 8px', fontWeight: '700', color: 'var(--text-primary)', fontSize: '11px', whiteSpace: 'nowrap' }}>
                                 {boro}
                               </td>
                               {HEATMAP_CUISINES.map((cuisine) => {
@@ -363,7 +363,7 @@ export default function HomePage() {
                         })}
                         {/* Total row */}
                         <tr>
-                          <td style={{ padding: '6px 8px', fontWeight: '700', color: '#1a2744', fontSize: '11px', backgroundColor: '#f5f5f5', border: '1px solid #e5e7eb', whiteSpace: 'nowrap' }}>
+                          <td style={{ padding: '6px 8px', fontWeight: '700', color: 'var(--heading-color)', fontSize: '11px', backgroundColor: 'var(--table-alt-row)', border: '1px solid var(--border-color)', whiteSpace: 'nowrap' }}>
                             Total
                           </td>
                           {HEATMAP_CUISINES.map((cuisine) => {
@@ -388,8 +388,8 @@ export default function HomePage() {
                       <div style={{ fontSize: '10px', color: '#9ca3af', marginBottom: '4px', textAlign: 'right' }}>High Risk %</div>
                       <div style={{ width: '200px', height: '12px', borderRadius: '6px', background: 'linear-gradient(to right, #2ecc71, #f39c12, #c0392b)' }} />
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3px' }}>
-                        <span style={{ fontSize: '10px', color: '#6b7280' }}>0%</span>
-                        <span style={{ fontSize: '10px', color: '#6b7280' }}>{maxPercentage.toFixed(1)}%</span>
+                        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>0%</span>
+                        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{maxPercentage.toFixed(1)}%</span>
                       </div>
                     </div>
                   </div>
@@ -398,7 +398,7 @@ export default function HomePage() {
             })()}
 
             {/* Row 2: Score Trend + Inspection Backlog side by side */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="charts-grid">
 
               {/* Score Trend */}
               {(() => {
@@ -414,7 +414,7 @@ export default function HomePage() {
                 return (
                   <div className="card" style={{ minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2px' }}>
-                      <div style={{ fontSize: '15px', fontWeight: '700', color: '#1a2744' }}>
+                      <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--heading-color)' }}>
                         NYC Average Inspection Score Over Time
                       </div>
                       <select
@@ -431,9 +431,9 @@ export default function HomePage() {
                     <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '14px' }}>Lower is better</div>
                     <ResponsiveContainer width="100%" height={220}>
                       <LineChart data={filteredTrend} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                        <XAxis dataKey="month" tickFormatter={fmtMonth} tick={{ fontSize: 11 }} />
-                        <YAxis tick={{ fontSize: 11 }} />
-                        <Tooltip formatter={(v) => [v, 'Avg Score']} labelFormatter={fmtMonth} contentStyle={{ fontSize: '12px' }} />
+                        <XAxis dataKey="month" tickFormatter={fmtMonth} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
+                        <YAxis tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
+                        <Tooltip formatter={(v) => [v, 'Avg Score']} labelFormatter={fmtMonth} contentStyle={{ fontSize: '12px', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} />
                         <Line type="monotone" dataKey="avg_score" stroke="#e67e22" strokeWidth={2} dot={{ r: 3 }} />
                       </LineChart>
                     </ResponsiveContainer>
@@ -449,7 +449,7 @@ export default function HomePage() {
                 })
                 return (
                   <div className="card" style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#1a2744', marginBottom: '2px' }}>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--heading-color)', marginBottom: '2px' }}>
                       Inspection Backlog
                     </div>
                     <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '14px' }}>
@@ -457,9 +457,9 @@ export default function HomePage() {
                     </div>
                     <ResponsiveContainer width="100%" height={220}>
                       <BarChart layout="vertical" data={gapData} margin={{ top: 4, right: 48, left: 8, bottom: 4 }}>
-                        <XAxis type="number" tick={{ fontSize: 11 }} />
-                        <YAxis type="category" dataKey="gap_bucket" width={100} tick={{ fontSize: 11 }} />
-                        <Tooltip formatter={(v) => [v.toLocaleString(), 'Restaurants']} contentStyle={{ fontSize: '12px' }} />
+                        <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
+                        <YAxis type="category" dataKey="gap_bucket" width={100} tick={{ fontSize: 11, fill: 'var(--text-secondary)' }} />
+                        <Tooltip formatter={(v) => [v.toLocaleString(), 'Restaurants']} contentStyle={{ fontSize: '12px', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }} />
                         <Bar dataKey="restaurant_count" radius={[0, 3, 3, 0]}>
                           {gapData.map((entry) => (
                             <Cell key={entry.gap_bucket} fill={GAP_COLORS[entry.gap_bucket]} />
@@ -468,7 +468,7 @@ export default function HomePage() {
                             dataKey="restaurant_count"
                             position="right"
                             formatter={(v) => v.toLocaleString()}
-                            style={{ fontSize: 11, fill: '#374151', fontWeight: 600 }}
+                            style={{ fontSize: 11, fill: 'var(--text-primary)', fontWeight: 600 }}
                           />
                         </Bar>
                       </BarChart>

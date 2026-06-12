@@ -35,8 +35,8 @@ export function paginationButtonStyle(disabled) {
     fontFamily: "'Inter', sans-serif",
     borderRadius: '6px',
     border: '1px solid #d1d5db',
-    backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-    color: disabled ? '#9ca3af' : '#2c3e50',
+    backgroundColor: disabled ? '#f3f4f6' : 'var(--bg-card)',
+    color: disabled ? '#9ca3af' : 'var(--text-primary)',
     cursor: disabled ? 'not-allowed' : 'pointer',
   }
 }

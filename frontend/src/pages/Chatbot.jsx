@@ -22,7 +22,7 @@ function AssistantBubble({ content, timestamp, isLatest }) {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
         <span style={{ fontSize: '20px', lineHeight: 1 }}>🍽️</span>
-        <span style={{ fontSize: '12px', fontWeight: '700', color: '#1a2744' }}>SafeBot</span>
+        <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--heading-color)' }}>SafeBot</span>
       </div>
       <div className="bubble-assistant">
         <ReactMarkdown>{text}</ReactMarkdown>
@@ -104,8 +104,8 @@ export default function ChatPage() {
         <div className="chat-panel">
 
           <div className="chat-panel-header">
-            <div style={{ fontSize: '18px', fontWeight: '700', color: '#1a2744' }}>SafePlate Assistant</div>
-            <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '2px' }}>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--heading-color)' }}>SafePlate Assistant</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '2px' }}>
               Ask anything about NYC restaurant inspections
             </div>
           </div>
@@ -133,12 +133,12 @@ export default function ChatPage() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <span style={{ fontSize: '20px', lineHeight: 1 }}>🍽️</span>
-                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#1a2744' }}>SafeBot</span>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--heading-color)' }}>SafeBot</span>
                 </div>
                 <div
                   style={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e5e7eb',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '20px 20px 20px 4px',
                     padding: '12px 18px',
                     display: 'flex',
@@ -168,7 +168,7 @@ export default function ChatPage() {
               disabled={loading}
               placeholder="Ask about NYC restaurant inspections..."
               className="chat-input"
-              style={{ backgroundColor: loading ? '#f9fafb' : '#ffffff' }}
+              style={{ backgroundColor: loading ? 'var(--table-alt-row)' : 'var(--bg-card)' }}
             />
             <button
               onClick={() => sendMessage(input)}
@@ -184,12 +184,12 @@ export default function ChatPage() {
         {/* Right: Data panel — 30% */}
         <div className="data-panel">
           <div className="data-panel-header">
-            <div style={{ fontSize: '18px', fontWeight: '700', color: '#1a2744' }}>Query Results</div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--heading-color)' }}>Query Results</div>
           </div>
           <div className="data-panel-body">
             {queryType === 'unanswerable' ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '4px' }}>Try these instead:</div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Try these instead:</div>
                 {suggestedQuestions.map((q, i) => (
                   <StarterChip key={i} text={q} onSend={sendMessage} />
                 ))}
@@ -204,7 +204,7 @@ export default function ChatPage() {
               }
               return (
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: '#2c3e50' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: 'var(--text-primary)' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#1a2744' }}>
                         {keys.map((k) => (
@@ -216,9 +216,9 @@ export default function ChatPage() {
                     </thead>
                     <tbody>
                       {queryData.map((row, i) => (
-                        <tr key={i} style={{ backgroundColor: i % 2 === 0 ? '#ffffff' : '#f9fafb' }}>
+                        <tr key={i} style={{ backgroundColor: i % 2 === 0 ? 'var(--bg-card)' : 'var(--table-alt-row)' }}>
                           {keys.map((k) => (
-                            <td key={k} style={{ padding: '8px 10px', borderBottom: '1px solid #f3f4f6', whiteSpace: 'nowrap' }}>
+                            <td key={k} style={{ padding: '8px 10px', borderBottom: '1px solid var(--border-color)', whiteSpace: 'nowrap' }}>
                               {renderCell(k, row[k])}
                             </td>
                           ))}

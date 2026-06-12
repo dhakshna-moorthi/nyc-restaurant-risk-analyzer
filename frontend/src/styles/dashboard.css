@@ -1,7 +1,7 @@
 /* ── Dashboard (RestaurantList) styles ────────────────────────────────────── */
 
 .filter-bar {
-  background-color: #ffffff;
+  background-color: var(--bg-primary);
   padding: 16px 24px;
   display: flex;
   gap: 12px;
@@ -17,11 +17,11 @@
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .table-scroll-wrap {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: auto;
@@ -31,7 +31,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  color: #2c3e50;
+  color: var(--text-primary);
 }
 
 .dashboard-table thead tr {
@@ -54,7 +54,104 @@
   white-space: nowrap;
 }
 
+[data-theme="dark"] .dashboard-table tbody td {
+  border-bottom-color: var(--border-color);
+}
+
 .overdue-dot {
   color: #e67e22;
   margin-right: 4px;
+}
+
+/* ── Bubble chart layout ────────────────────────────────────────────────────── */
+.bubble-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.bubble-meta {
+  text-align: right;
+}
+
+.bubble-legend {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+.bubble-disclaimers {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  color: #9ca3af;
+  font-style: italic;
+  line-height: 1.8;
+}
+
+.bubble-chart-wrapper {
+  height: 500px;
+}
+
+/* ── Responsive: Tablet 768px – 1023px ────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .filter-bar {
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Responsive: Mobile < 768px ────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+    gap: 8px;
+  }
+
+  .filter-bar .filter-input,
+  .filter-bar .filter-select {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .filter-bar-view-toggle {
+    margin-left: 0 !important;
+  }
+
+  .dashboard-table {
+    font-size: 12px;
+  }
+
+  .dashboard-table th[data-col="risk_percentile"],
+  .dashboard-table td[data-col="risk_percentile"],
+  .dashboard-table th[data-col="last_violation_code"],
+  .dashboard-table td[data-col="last_violation_code"] {
+    display: none;
+  }
+
+  .bubble-header-row {
+    flex-direction: column;
+  }
+
+  .bubble-meta {
+    text-align: left;
+    margin-top: 12px;
+  }
+
+  .bubble-legend {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .bubble-chart-wrapper {
+    height: 350px;
+  }
+
+  td.sticky-col,
+  th.sticky-col {
+    position: static !important;
+  }
 }
