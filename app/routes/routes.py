@@ -1,17 +1,34 @@
 from app.schemas import AIInsights, ChatRequest, ChatResponse, HomeResponse, RestaurantDetailResponse, RestaurantListResponse, LoginResponse, BubbleRestaurant
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.database import get_db
 from app.services.restaurant_service import get_restaurant_detail, get_restaurants_service, get_home_data, get_bubble_data
 from app.services.chatbot_service import chat
-from jose import jwt
+from jose import jwt, JWTError
 from datetime import datetime, timedelta
 import os
 import json
 
 router = APIRouter()
+
+security = HTTPBearer()
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(
+            credentials.credentials,
+            os.getenv("JWT_SECRET"),
+            algorithms=["HS256"]
+        )
+        return payload
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
 
 @router.get("/health")
 def read_root():
@@ -35,7 +52,7 @@ def login(payload: dict):
 
 
 @router.get("/home", response_model=HomeResponse)
-def get_home(db: Session = Depends(get_db)):
+def get_home(db: Session = Depends(get_db), _: dict = Depends(verify_token)):
     return get_home_data(db)
 
 
@@ -51,7 +68,8 @@ def get_restaurants(
     sort_order: Optional[str] = None,
     page: int = 1,
     page_size: int = 50,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: dict = Depends(verify_token)
 ):
     return get_restaurants_service(
         db=db,
@@ -75,7 +93,8 @@ def get_bubble_chart_data(
     cuisine: Optional[str] = None,
     criticality: Optional[str] = None,
     trend: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: dict = Depends(verify_token)
 ):
     return get_bubble_data(db, search, boro, cuisine, criticality, trend)
 
@@ -84,7 +103,8 @@ def get_bubble_chart_data(
 def get_restaurant_detail_route(
     camis: int,
     page: int = 1,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _: dict = Depends(verify_token)
 ):
     result = get_restaurant_detail(camis=camis, page=page, db=db)
     if not result:
@@ -93,7 +113,7 @@ def get_restaurant_detail_route(
 
 
 @router.get("/restaurants/{camis}/insights", response_model=AIInsights)
-def get_restaurant_insights(camis: int, db: Session = Depends(get_db)):
+def get_restaurant_insights(camis: int, db: Session = Depends(get_db), _: dict = Depends(verify_token)):
     
     # Check Redis cache first
     from app.services.redis_service import get_cached
@@ -123,7 +143,7 @@ def get_restaurant_insights(camis: int, db: Session = Depends(get_db)):
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat_endpoint(payload: ChatRequest, db: Session = Depends(get_db)):
+def chat_endpoint(payload: ChatRequest, db: Session = Depends(get_db), _: dict = Depends(verify_token)):
     question = payload.question.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Question is required")

@@ -2,12 +2,22 @@ from app.routes import routes
 from app.database import engine, Base
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
-app = FastAPI()
+environment = os.getenv("ENVIRONMENT", "development")
+
+if environment == "production":
+    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+else:
+    app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "https://safeplatenyc.vercel.app", "https://safeplatenyc.onrender.com"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "https://safeplatenyc.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
