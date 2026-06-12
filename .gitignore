@@ -1,6 +1,5 @@
 .env
 frontend/.env*
-*.pyc
 venv/
 docs/
 __pycache__/
