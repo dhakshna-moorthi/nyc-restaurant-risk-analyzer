@@ -5,13 +5,15 @@ import os
 
 load_dotenv()
 
-password = os.getenv("DB_PASSWORD")
-dbname = os.getenv("DB_NAME")
-user = os.getenv("DB_USER")
-host = os.getenv("DB_HOST")
-port = os.getenv("DB_PORT")
+# password = os.getenv("DB_PASSWORD")
+# dbname = os.getenv("DB_NAME")
+# user = os.getenv("DB_USER")
+# host = os.getenv("DB_HOST")
+# port = os.getenv("DB_PORT")
 
-DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
+# DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
