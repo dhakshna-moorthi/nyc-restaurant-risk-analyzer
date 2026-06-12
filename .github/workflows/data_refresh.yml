@@ -1,4 +1,4 @@
-name: Monthly Data Refresh
+name: Weekly Data Refresh
 
 on:
   schedule:
