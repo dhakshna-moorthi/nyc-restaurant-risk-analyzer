@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-environment = os.getenv("ENVIRONMENT", "development")
+environment = os.getenv("ENVIRONMENT")
 
 if environment == "production":
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)

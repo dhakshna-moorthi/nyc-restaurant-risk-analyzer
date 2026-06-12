@@ -184,6 +184,8 @@ This will:
 Create a `.env` file based on `.env.example`:
 
 ```
+ENVIRONMENT=development
+
 DATABASE_URL=your_db_connection_url
 
 UPSTASH_REDIS_REST_URL=your_upstash_url
