@@ -212,7 +212,7 @@ JWT_SECRET=your_jwt_secret
 | Component | Platform | URL |
 |---|---|---|
 | React Frontend | Vercel | [safeplatenyc.vercel.app](https://safeplatenyc.vercel.app) |
-| FastAPI Backend | Render | [safeplatenyc.onrender.com](https://safeplatenyc.onrender.com) |
+| FastAPI Backend | Render | — |
 | PostgreSQL + pgvector | Supabase | — |
 | Redis Cache | Upstash | — |
 
@@ -222,6 +222,5 @@ JWT_SECRET=your_jwt_secret
 
 ## API Documentation
 
-- Swagger UI: `https://safeplatenyc.onrender.com/docs`
-- Local: `http://localhost:8000/docs`
+Local: `http://localhost:8000/docs`
 
