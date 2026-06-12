@@ -242,7 +242,7 @@ def compute_violation_embeddings(affected_camis: set = None):
         logger.info(f"Deleted old embeddings for {len(affected_camis)} restaurants")
     
     # Generate new embeddings in batches
-    batch_size = 2048
+    batch_size = 100
     total = len(df)
     df = df.reset_index(drop=True)
     
@@ -446,40 +446,41 @@ def main():
     
     try:
         # Step 0 - Fetch new data from NYC Open Data
-        logger.info("Step 0/5: Fetching new data from NYC Open Data...")
+        logger.info("Step 0/6: Fetching new data from NYC Open Data...")
         df = fetch_and_process_data()
         print(f"✓ Fetched {len(df) if df is not None else 0} new records from API")
         
         if df is not None:
             # Step 1 - Create tables
-            logger.info("Step 1/5: Creating tables...")
+            logger.info("Step 1/6: Creating tables...")
             # create_tables()
             logger.info("✓ Tables ready")
             
             # Step 2 - Load restaurant and inspection data
-            logger.info("Step 2/5: Loading restaurant and inspection data...")
+            logger.info("Step 2/6: Loading restaurant and inspection data...")
             load_inspections_restaurants_data(df)
             logger.info("✓ Restaurant and inspection data loaded")
         
             # Step 3 - Load violation codes
-            logger.info("Step 3/5: Loading violation codes...")
+            logger.info("Step 3/6: Loading violation codes...")
             # load_violation_codes_data()
             logger.info("✓ Violation codes loaded")
             
             # Step 4 - Compute violation embeddings
-            logger.info("Step 4/5: Computing violation embeddings...")
-            affected_camis = set(df['CAMIS'].dropna().astype(int).unique()) # Track which restaurants are affected
+            logger.info("Step 4/6: Computing violation embeddings...")
+            affected_camis = set(df['camis'].dropna().astype(int).unique()) # Track which restaurants are affected
             logger.info(f"{len(affected_camis)} restaurants affected by new data")
             compute_violation_embeddings(affected_camis=affected_camis)
             logger.info("✓ Embeddings computed")
             
             # Step 5 - Calculate risk scores
-            logger.info("Step 5/5: Calculating risk scores...")
+            logger.info("Step 5/6: Calculating risk scores...")
             calculate_risk_scores()
             logger.info("✓ Risk scores calculated")
             
             #step 6 - Clear Redis cache
             if df is not None and not df.empty:
+                logger.info("Step 6/6: Clearing redis cache...")
                 redis_client.flushdb()
                 logger.info("✓ Redis database cleared.")
 
