@@ -205,7 +205,7 @@ JWT_SECRET=your_jwt_secret
 ## Data Source
 
 - **NYC DOHMH Restaurant Inspection Results** — [NYC Open Data](https://data.cityofnewyork.us/resource/43nn-pn8j.json)
-- Updated monthly by NYC Department of Health and Mental Hygiene
+- Updated daily by NYC Department of Health and Mental Hygiene
 - ~290,000 inspection records, 27,000+ restaurants
 - **NYC Health Violation Code Reference** — [GitHub: nychealth/Food-Safety-Health-Code-Reference](https://github.com/nychealth/Food-Safety-Health-Code-Reference)
 
@@ -220,7 +220,7 @@ JWT_SECRET=your_jwt_secret
 | PostgreSQL + pgvector | Supabase | — |
 | Redis Cache | Upstash | — |
 
-**Data refresh** runs automatically every Monday via GitHub Actions, fetching the latest NYC inspection data from the open data API.
+**Data refresh** runs automatically on the first day of every month via GitHub Actions, fetching the latest NYC inspection data from the open data API.
 
 ---
 
