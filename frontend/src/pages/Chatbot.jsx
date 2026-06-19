@@ -7,9 +7,10 @@ import '../styles/chatbot.css'
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const CHAT_STARTERS = [
-  "Which restaurants in Manhattan have the highest risk scores?",
-  "Plan my inspection schedule for this week — 3 restaurants per day",
-  "Which cuisine types have the most critical violations?",
+  "Which restaurants are trending worse — show me declining risk scores across all boroughs",
+  "Find restaurants with signs of pest or rodent issues in Brooklyn",
+  "Build a 5-day inspection plan for the Bronx, prioritizing High criticality restaurants",
+  "What are the most common public health hazard violations, and which boroughs have the most?",
 ]
 
 // ── Sub-components ─────────────────────────────────────────────────────────

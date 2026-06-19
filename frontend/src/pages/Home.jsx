@@ -50,7 +50,7 @@ function DailyBriefingCard({ loading, briefing = [] }) {
     <div className="card" style={{ marginBottom: '24px', backgroundColor: '#1a2744' }}>
       <div className="briefing-header">
         <div>
-          <div className="briefing-title">📅 Weekly Briefing</div>
+          <div className="briefing-title">Weekly Briefing</div>
           <div className="briefing-subtitle">
             AI-generated insights based on current inspection data
           </div>
@@ -291,21 +291,23 @@ export default function HomePage() {
                 }
               }
 
-              const dataStyle = (pct, align = 'center') => ({
+              const dataStyle = (pct) => ({
+                width: '100px',
+                minWidth: '100px',
+                maxWidth: '100px',
                 padding: '6px 8px',
-                textAlign: align,
+                textAlign: 'center',
                 verticalAlign: 'middle',
                 backgroundColor: getHeatmapColor(pct, maxPercentage),
                 color: '#1a1a1a',
                 border: '1px solid var(--border-color)',
-                whiteSpace: 'nowrap',
               })
 
               const CellBody = ({ count, pct }) => (
-                <>
-                  <div style={{ fontWeight: 700, fontSize: '12px' }}>{count}</div>
-                  <div style={{ fontSize: '10px', opacity: 0.8 }}>{safePct(pct).toFixed(1)}%</div>
-                </>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px' }}>
+                  <div style={{ fontWeight: 700, fontSize: '12px', lineHeight: 1.2 }}>{count}</div>
+                  <div style={{ fontSize: '10px', opacity: 0.8, lineHeight: 1.2 }}>{safePct(pct).toFixed(1)}%</div>
+                </div>
               )
 
               return (
@@ -317,7 +319,7 @@ export default function HomePage() {
                     Showing top 10 cuisine types by restaurant count
                   </div>
                   <div style={{ overflowX: 'auto', width: '100%' }}>
-                    <table style={{ borderCollapse: 'collapse', fontSize: '11px', width: '100%' }}>
+                    <table style={{ borderCollapse: 'collapse', fontSize: '11px', width: '100%', tableLayout: 'fixed' }}>
                       <thead>
                         <tr style={{ backgroundColor: '#1a2744' }}>
                           <th style={{ padding: '6px 8px', textAlign: 'left', color: '#ffffff', fontWeight: '600', fontSize: '11px', whiteSpace: 'nowrap', minWidth: '120px', width: '120px' }}>
@@ -328,7 +330,7 @@ export default function HomePage() {
                               {c}
                             </th>
                           ))}
-                          <th style={{ padding: '6px 8px', textAlign: 'right', color: '#ffffff', fontWeight: '600', fontSize: '11px', backgroundColor: '#0f1a33', whiteSpace: 'nowrap', minWidth: '90px', width: '90px' }}>
+                          <th style={{ padding: '6px 8px', textAlign: 'center', color: '#ffffff', fontWeight: '600', fontSize: '11px', backgroundColor: '#0f1a33', whiteSpace: 'nowrap', minWidth: '100px', width: '100px' }}>
                             Total
                           </th>
                         </tr>
@@ -355,7 +357,7 @@ export default function HomePage() {
                                   </td>
                                 )
                               })}
-                              <td style={{ ...dataStyle(bPct, 'right'), fontWeight: 700 }}>
+                              <td style={{ ...dataStyle(bPct), fontWeight: 700 }}>
                                 <CellBody count={bTotal.high_risk_count ?? 0} pct={bPct} />
                               </td>
                             </tr>
@@ -375,21 +377,51 @@ export default function HomePage() {
                               </td>
                             )
                           })}
-                          <td style={{ ...dataStyle(safePct(grandTotal.high_risk_percentage), 'right'), fontWeight: 700 }}>
+                          <td style={{ ...dataStyle(safePct(grandTotal.high_risk_percentage)), fontWeight: 700 }}>
                             <CellBody count={grandTotal.high_risk_count ?? 0} pct={safePct(grandTotal.high_risk_percentage)} />
                           </td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
-                  {/* Color legend */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
-                    <div>
-                      <div style={{ fontSize: '10px', color: '#9ca3af', marginBottom: '4px', textAlign: 'right' }}>High Risk %</div>
-                      <div style={{ width: '200px', height: '12px', borderRadius: '6px', background: 'linear-gradient(to right, #2ecc71, #f39c12, #c0392b)' }} />
+                  {/* Legend */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '32px', marginTop: '16px', flexWrap: 'wrap', borderTop: '1px solid var(--border-color)', paddingTop: '14px' }}>
+                    {/* Sample cell + explanation */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      {/* Sample cell */}
+                      <div style={{
+                        backgroundColor: '#f39c12',
+                        border: '1px solid rgba(0,0,0,0.25)',
+                        borderRadius: '3px',
+                        padding: '6px 14px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '1px',
+                        flexShrink: 0,
+                      }}>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: '#1a1a1a', lineHeight: 1.2 }}>42</div>
+                        <div style={{ fontSize: '10px', color: '#1a1a1a', opacity: 0.85, lineHeight: 1.2 }}>18.5%</div>
+                      </div>
+                      {/* Line-by-line explanations */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '11px', color: 'var(--text-secondary)' }}>
+                        <div>
+                          <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>42</span>
+                          <span style={{ marginLeft: '5px' }}>= No. of high risk restaurants in that borough &amp; cuisine</span>
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>18.5%</span>
+                          <span style={{ marginLeft: '5px' }}>= % of all restaurants in that borough &amp; cuisine that are high risk</span>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Color gradient */}
+                    <div style={{ marginLeft: 'auto' }}>
+                      <div style={{ fontSize: '10px', color: '#9ca3af', marginBottom: '4px' }}>Cell color = High Risk %</div>
+                      <div style={{ width: '180px', height: '12px', borderRadius: '6px', background: 'linear-gradient(to right, #2ecc71, #f39c12, #c0392b)' }} />
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '3px' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>0%</span>
-                        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{maxPercentage.toFixed(1)}%</span>
+                        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Low (0%)</span>
+                        <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>High ({maxPercentage.toFixed(1)}%)</span>
                       </div>
                     </div>
                   </div>

@@ -20,7 +20,7 @@ violation_codes: violation_code (PK), category, risk_tier (public_health_hazard/
 
 IMPORTANT: Always use descriptive column aliases that read naturally:
   r.dba AS "Restaurant Name"
-  r.boro AS "Area"  
+  r.boro AS "Area"
   r.cuisine_description AS "Cuisine"
   rs.risk_score AS "Risk Score"
   rs.criticality AS "Criticality"
@@ -30,55 +30,15 @@ IMPORTANT: Always use descriptive column aliases that read naturally:
 
 """
 
-ROUTER_SYSTEM_PROMPT = """You are a query router for a NYC restaurant health inspection system.
+SYSTEM_PROMPT = """You are SafeBot, an NYC health inspection analyst assistant.
+You help health inspectors analyze restaurant inspection data.
 
 {schema}
 
-Given a user question (considering conversation history), determine if it needs:
-1. "sql" - for counting, ranking, filtering, scheduling, aggregations, or specific data lookups
-2. "semantic" - for finding restaurants with similar violation patterns or descriptions
-
-Set "answerable" to false if the question:
-- Is not related to NYC restaurant health inspections
-- Requires data not available in the tables above
-- Is too vague to generate a meaningful query
-- Is a general knowledge question unrelated to inspections
-- Asks for personal recommendations, opinions, or subjective judgments
-- Uses words like "best", "worst", "recommend", "suggest" in a consumer context
-
-When not answerable, suggest 3 specific questions the system CAN answer.
-
-Respond ONLY in this JSON format:
-{{
-    "type": "sql" or "semantic",
-    "query": "SQL SELECT query here (if sql) or empty string (if semantic)",
-    "search_text": "text to search for (if semantic) or empty string (if sql)",
-    "answerable": true or false,
-    "reason": "brief reason if not answerable, empty string if answerable",
-    "suggested_similar_questions": [
-        "Question 1",
-        "Question 2", 
-        "Question 3"
-    ]
-}}
-
-Rules for SQL:
-- Only write SELECT statements
-- Always LIMIT to 20 rows maximum
-- Use proper JOINs across tables
-- For scheduling questions, order by risk_score DESC
-- ONLY use PostgreSQL syntax — no QUALIFY, no TOP, no LIMIT BY
-- For top-N per group queries, use subqueries with ROW_NUMBER() window function
-- ALWAYS join risk_scores to include risk_score, criticality, and trend columns
-- Example for top 5 per borough:
-  SELECT * FROM (
-    SELECT *, ROW_NUMBER() OVER (PARTITION BY boro ORDER BY risk_score DESC) as rn
-    FROM ...
-  ) ranked WHERE rn <= 5
-  """
-
-ANSWER_SYSTEM_PROMPT = """You are SafeBot, an NYC health inspection analyst assistant. 
-You help health inspectors analyze restaurant inspection data.
+Use the provided tools to query the database whenever needed:
+- Use execute_sql_query for counting, ranking, filtering, scheduling, aggregations, or specific data lookups
+- Use execute_semantic_search for finding restaurants with similar violation patterns or descriptions
+- Use report_unanswerable when the question is out of scope or cannot be answered with available data
 
 Guidelines:
 - Answer directly and specifically using the retrieved data
@@ -90,150 +50,200 @@ Guidelines:
 - When answering questions that compare raw counts across boroughs or cuisine types, 
   add a brief disclaimer: "Note: raw counts may be influenced by the number of 
   restaurants in each area — percentage-based comparisons are more meaningful."
-- Only add this disclaimer when the question involves counts across different sized groups"""
+- Only add this disclaimer when the question involves counts across different sized groups
 
+Formatting rules — follow these strictly:
+- NEVER use markdown tables. Tables are forbidden.
+- Present lists of restaurants as numbered lists
+- For each restaurant entry use this pattern:
+  **Restaurant Name** *(Cuisine, Borough)* — Risk Score: **XX.X** | Criticality: High/Medium/Low | Trend: Improving/Stable/Declining
+- Use **bold** for restaurant names, risk scores, and key figures
+- Use *italics* for cuisine type, borough, and secondary descriptors
+- Use ## headings to group results when breaking out by borough or category
+- End with a short 1–2 sentence plain-English summary of what the data shows
+- For scheduling answers, use ## Day 1, ## Day 2, etc. as section headers
 
-def route_query(question: str, conversation_history: list) -> dict:
-    messages = [
-        {
-            "role": "system",
-            "content": ROUTER_SYSTEM_PROMPT.format(schema=SCHEMA_DESCRIPTION)
+Call report_unanswerable when the question:
+- Is not related to NYC restaurant health inspections
+- Requires data not available in the tables above
+- Is too vague to generate a meaningful query
+- Is a general knowledge question unrelated to inspections
+- Asks for personal recommendations, opinions, or subjective judgments
+
+Rules for SQL queries:
+- Only write SELECT statements
+- Always LIMIT to 20 rows maximum
+- Use proper JOINs across tables
+- For scheduling questions, order by risk_score DESC
+- ONLY use PostgreSQL syntax — no QUALIFY, no TOP, no LIMIT BY
+- For top-N per group queries, use subqueries with ROW_NUMBER() window function
+- ALWAYS join risk_scores to include risk_score, criticality, and trend columns
+"""
+
+execute_sql_query_schema = {
+    "type": "function",
+    "function": {
+        "name": "execute_sql_query",
+        "description": "Executes a SQL SELECT query against the database and returns the results. Use for counting, ranking, filtering, scheduling, aggregations, or specific data lookups. Only SELECT statements are allowed. Always LIMIT to 20 rows maximum. Use PostgreSQL syntax only.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "A valid PostgreSQL SELECT query string."
+                }
+            },
+            "required": ["query"]
         }
-    ]
-    
-    # Add conversation history for context
-    for msg in conversation_history:
-        messages.append(msg)
-    
-    # Add current question
-    messages.append({"role": "user", "content": question})
-    
-    response = client.chat.completions.create(
-        model="gpt-5.4-nano",
-        messages=messages
-    )
+    }
+}
 
-    response_text = response.choices[0].message.content.strip()
-    print("Raw LLM response (query routing):", response_text)
-
-    if "```json" in response_text:
-        response_text = response_text.split("```json")[1].split("```")[0].strip()
-    elif "```" in response_text:
-        response_text = response_text.split("```")[1].split("```")[0].strip()
-
-    try:
-        return json.loads(response_text)
-    except json.JSONDecodeError:
-        return {
-            "type": "semantic",
-            "query": "",
-            "search_text": question,
-            "answerable": True,
-            "reason": "",
-            "suggested_similar_questions": []
+execute_semantic_search_schema = {
+    "type": "function",
+    "function": {
+        "name": "execute_semantic_search",
+        "description": "Searches restaurants using semantic similarity against health violation records. Given a natural language description (e.g. 'dirty kitchen', 'rodent issues', 'improper food storage'), returns the top 10 most semantically similar restaurants ranked by violation similarity. Each result includes restaurant identity, borough, cuisine type, risk score, criticality level, trend, and similarity score.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "search_text": {
+                    "type": "string",
+                    "description": "Natural language description of a violation type, health concern, or restaurant characteristic to search for."
+                }
+            },
+            "required": ["search_text"]
         }
+    }
+}
+
+report_unanswerable_schema = {
+    "type": "function",
+    "function": {
+        "name": "report_unanswerable",
+        "description": "Call this when the user's question is out of scope or cannot be answered using the available database. Provide a brief reason and exactly 3 alternative questions the user could ask instead.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "type": "string",
+                    "description": "Brief explanation of why the question cannot be answered."
+                },
+                "suggested_questions": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Exactly 3 alternative questions the user could ask about NYC restaurant health inspections.",
+                    "minItems": 3,
+                    "maxItems": 3
+                }
+            },
+            "required": ["reason", "suggested_questions"]
+        }
+    }
+}
 
 
 def execute_sql_safely(query: str, db: Session) -> list:
     cleaned = query.strip().upper()
     if not cleaned.startswith("SELECT"):
         raise ValueError("Only SELECT queries are allowed")
-    
+
     dangerous = ["DROP", "DELETE", "INSERT", "UPDATE", "TRUNCATE", "ALTER"]
     for keyword in dangerous:
         if keyword in cleaned:
             raise ValueError(f"Query contains forbidden keyword: {keyword}")
-    
+
     result = db.execute(text(query))
     rows = result.fetchall()
     return [dict(r._mapping) for r in rows]
 
 
-def answer_question(question: str, data: list, conversation_history: list) -> str:
-    messages = [
-        {
-            "role": "system",
-            "content": ANSWER_SYSTEM_PROMPT
-        }
-    ]
-    
-    # Add conversation history for context
-    for msg in conversation_history:  
-        messages.append(msg)
-    
-    # Add current question with retrieved data
-    messages.append({
-        "role": "user",
-        "content": f"""Question: {question}
+def execute_sql_query(query: str, db: Session) -> str:
+    try:
+        results = execute_sql_safely(query, db)
+        return json.dumps(results, default=str)
+    except Exception as e:
+        return json.dumps({"error": str(e)})
 
-Retrieved data:
-{json.dumps(data, indent=2, default=str)}
 
-Answer based on this data."""
-    })
-    
-    response = client.chat.completions.create(
-        model="gpt-5.4-nano",
-        messages=messages
-    )
-
-    print("Raw LLM response (question answer):", response.choices[0].message.content.strip())
-
-    return response.choices[0].message.content.strip()
+def execute_semantic_search(search_text: str, db: Session) -> str:
+    embedding = get_embedding(search_text)
+    db.rollback()
+    results = db.execute(text("""
+        SELECT
+            r.camis, r.dba, r.boro, r.cuisine_description,
+            rs.risk_score, rs.criticality, rs.trend,
+            1 - (ve.embedding <=> CAST(:embedding AS vector)) as similarity
+        FROM violation_embeddings ve
+        JOIN restaurants r ON ve.camis = r.camis
+        JOIN risk_scores rs ON ve.camis = rs.camis
+        ORDER BY ve.embedding <=> CAST(:embedding AS vector)
+        LIMIT 10
+    """), {"embedding": str(embedding)}).fetchall()
+    data = [dict(r._mapping) for r in results]
+    return json.dumps(data, default=str)
 
 
 def chat(question: str, db: Session, conversation_history: list = None) -> dict:
     if conversation_history is None:
         conversation_history = []
-    
-    # Step 1 - Route the query with conversation context
-    routing = route_query(question, conversation_history)
-    
-    if not routing.get("answerable", True):
-        return {
-            "answer": f"I don't have enough information to answer that. {routing.get('reason', '')}",
-            "type": "unanswerable",
-            "data": [],
-            "suggested_questions": routing.get("suggested_similar_questions", [])
-        }
-    
-    # Step 2 - Execute based on type
-    data = []
-    query_type = routing.get("type", "semantic")
-    
-    if query_type == "sql":
-        try:
-            data = execute_sql_safely(routing["query"], db)
-        except Exception as e:
-            query_type = "semantic"
-            routing["search_text"] = question
-    
-    if query_type == "semantic":
-        search_text = routing.get("search_text") or question
-        embedding = get_embedding(search_text)
 
-        db.rollback()
-        
-        results = db.execute(text("""
-            SELECT 
-                r.camis, r.dba, r.boro, r.cuisine_description,
-                rs.risk_score, rs.criticality, rs.trend,
-                1 - (ve.embedding <=> CAST(:embedding AS vector)) as similarity
-            FROM violation_embeddings ve
-            JOIN restaurants r ON ve.camis = r.camis
-            JOIN risk_scores rs ON ve.camis = rs.camis
-            ORDER BY ve.embedding <=> CAST(:embedding AS vector)
-            LIMIT 10
-        """), {"embedding": str(embedding)}).fetchall()
-        
-        data = [dict(r._mapping) for r in results]
-    
-    # Step 3 - Generate answer with conversation context
-    answer = answer_question(question, data, conversation_history)
-    
+    messages = [{"role": "system", "content": SYSTEM_PROMPT.format(schema=SCHEMA_DESCRIPTION)}]
+    messages.extend(conversation_history)
+    messages.append({"role": "user", "content": question})
+
+    all_data = []
+    query_type = None
+
+    while True:
+        response = client.chat.completions.create(
+            model="gpt-5.4-nano",
+            messages=messages,
+            tools=[execute_sql_query_schema, execute_semantic_search_schema, report_unanswerable_schema]
+        )
+
+        assistant_message = response.choices[0].message
+        messages.append(assistant_message)
+
+        if response.choices[0].finish_reason != "tool_calls":
+            answer = assistant_message.content or ""
+            break
+
+        for tool_call in assistant_message.tool_calls:
+            name = tool_call.function.name
+            args = json.loads(tool_call.function.arguments)
+
+            if name == "execute_sql_query":
+                query_type = "SQL"
+                result = execute_sql_query(args["query"], db)
+            elif name == "execute_semantic_search":
+                query_type = "Semantic"
+                result = execute_semantic_search(args["search_text"], db)
+            elif name == "report_unanswerable":
+                print(messages)
+                return {
+                    "answer": args.get("reason", "I cannot answer that question."),
+                    "type": "unanswerable",
+                    "data": [],
+                    "suggested_questions": args.get("suggested_questions", [])
+                }
+            else:
+                result = json.dumps({"error": f"Unknown tool: {name}"})
+
+            parsed = json.loads(result)
+            if isinstance(parsed, list):
+                all_data.extend(parsed)
+
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": result
+            })
+
+    print(messages)
+
     return {
         "answer": answer,
         "type": query_type,
-        "data": data[:10],
+        "data": all_data[:10],
         "suggested_questions": []
     }
