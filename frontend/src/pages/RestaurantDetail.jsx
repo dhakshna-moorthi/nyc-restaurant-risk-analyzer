@@ -433,7 +433,6 @@ function RestaurantDetail({ camis }) {
           `${import.meta.env.VITE_API_URL}/restaurants/${camis}?page=1`,
           {
             signal: controller.signal,
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
           }
         )
         if (res.status === 404) { setError('not_found'); return }
@@ -459,7 +458,6 @@ function RestaurantDetail({ camis }) {
           `${import.meta.env.VITE_API_URL}/restaurants/${camis}?page=${inspPage}`,
           {
             signal: controller.signal,
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
           }
         )
         if (!res.ok) throw new Error('Request failed')
@@ -478,9 +476,7 @@ function RestaurantDetail({ camis }) {
   const fetchInsights = () => {
     setInsightsLoading(true)
     setInsightsError(false)
-    fetch(`${import.meta.env.VITE_API_URL}/restaurants/${camis}/insights`, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
-    })
+    fetch(`${import.meta.env.VITE_API_URL}/restaurants/${camis}/insights`)
       .then((res) => { if (!res.ok) throw new Error('Failed'); return res.json() })
       .then((d) => { setInsights(d); setInsightsLoading(false) })
       .catch(() => { setInsightsError(true); setInsightsLoading(false) })

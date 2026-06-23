@@ -126,7 +126,6 @@ export default function HomePage() {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/home`, {
           signal: controller.signal,
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
         })
         if (!res.ok) throw new Error('Request failed')
         setData(await res.json())

@@ -389,7 +389,6 @@ export default function RestaurantList() {
           `${import.meta.env.VITE_API_URL}/restaurants?${params}`,
           {
             signal: controller.signal,
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
           }
         )
         if (!response.ok) throw new Error('Request failed')
@@ -427,7 +426,6 @@ export default function RestaurantList() {
           `${import.meta.env.VITE_API_URL}/restaurants/bubble?${params}`,
           {
             signal: controller.signal,
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}` },
           }
         )
         if (!response.ok) throw new Error('Request failed')

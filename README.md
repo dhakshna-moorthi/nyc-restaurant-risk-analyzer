@@ -101,8 +101,7 @@ nyc-restaurant-risk-analyzer/
 │   │   │   ├── Home.jsx
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── RestaurantDetail.jsx
-│   │   │   ├── Chatbot.jsx
-│   │   │   └── Login.jsx
+│   │   │   └── Chatbot.jsx
 │   │   ├── styles/
 │   │   │   ├── home.css
 │   │   │   ├── dashboard.css
@@ -192,10 +191,6 @@ UPSTASH_REDIS_REST_URL=your_upstash_url
 UPSTASH_REDIS_REST_TOKEN=your_upstash_token
 
 OPENAI_API_KEY=your_openai_key
-
-LOGIN_USERNAME=inspector
-LOGIN_PASSWORD=your_password
-JWT_SECRET=your_jwt_secret
 ```
 
 ---

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import '../styles/shared.css'
 
+
 function NavLink({ to, children }) {
   const location = useLocation()
   const navigate = useNavigate()
@@ -39,12 +40,6 @@ export function Header() {
     localStorage.setItem('safeplate_theme', dark ? 'dark' : 'light')
   }, [dark])
 
-  const handleLogout = () => {
-    localStorage.removeItem('safeplate_token')
-    navigate('/login')
-    setMenuOpen(false)
-  }
-
   return (
     <header className="site-header">
       <div className="site-header-logo" onClick={() => navigate('/')}>
@@ -60,7 +55,6 @@ export function Header() {
           <button className={`nav-theme-btn${!dark ? ' active' : ''}`} onClick={() => setDark(false)}>Light</button>
           <button className={`nav-theme-btn${dark ? ' active' : ''}`} onClick={() => setDark(true)}>Dark</button>
         </div>
-        <button className="btn-logout" onClick={handleLogout}>Logout</button>
       </nav>
 
       {/* Hamburger button — mobile only */}
@@ -77,8 +71,6 @@ export function Header() {
             <button className={`nav-mobile-theme-btn${!dark ? ' active' : ''}`} onClick={() => setDark(false)}>Light</button>
             <button className={`nav-mobile-theme-btn${dark ? ' active' : ''}`} onClick={() => setDark(true)}>Dark</button>
           </div>
-          <hr className="nav-mobile-divider" />
-          <button className="nav-mobile-item" onClick={handleLogout}>Logout</button>
         </div>
       )}
     </header>

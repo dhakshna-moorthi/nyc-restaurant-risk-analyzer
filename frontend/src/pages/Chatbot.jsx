@@ -68,7 +68,6 @@ export default function ChatPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('safeplate_token')}`,
         },
         body: JSON.stringify({ question: msg, conversation_history: conversationHistory }),
       })

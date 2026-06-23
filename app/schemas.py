@@ -233,16 +233,6 @@ class HomeResponse(BaseModel):
     daily_briefing: list[str]
 
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
-
-class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
-
-
 class BubbleRestaurant(BaseModel):
     camis: int
     dba: Optional[str] = None
